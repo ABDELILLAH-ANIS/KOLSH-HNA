@@ -1,4 +1,4 @@
-# كلش هنا — Kolch Hna 🛒
+# كلش هنا — Kolch Hna 
 
 منصة تجارة إلكترونية جزائرية متكاملة تجمع بين المتاجر الإلكترونية، العقارات، الجملة، والدفع بالتقسيط — مبنية بـ HTML/CSS/JS مع Supabase كـ Backend.
 
@@ -6,7 +6,7 @@
 
 ---
 
-## ✨ المميزات / Features
+##  المميزات / Features
 
 | الميزة | Feature |
 |--------|---------|
@@ -22,7 +22,7 @@
 
 ---
 
-## 🛠️ التقنيات المستخدمة / Tech Stack
+## التقنيات المستخدمة / Tech Stack
 
 - **Frontend** — Vanilla HTML, CSS, JavaScript (no framework)
 - **Backend / Database** — [Supabase](https://supabase.com) (PostgreSQL + Auth + RLS)
@@ -45,7 +45,7 @@ const CONFIG = {
 > The **anon key** is designed to be public — your data is protected by Row Level Security (RLS) policies already defined in the SQL schema. Never use your **service role key** here.
 ---
 
-## 📁 هيكل المشروع / Project Structure
+## هيكل المشروع / Project Structure
 
 ```
 kolch-hna/
@@ -70,7 +70,7 @@ kolch-hna/
 
 ---
 
-## 🔐 الأمان / Security Notes
+## الأمان / Security Notes
 
 - **RLS enabled on every table** with fine-grained policies.
 - **Never commit** your `service_role` key — only the `anon` key belongs in client code.
@@ -79,6 +79,6 @@ kolch-hna/
 
 ---
 
-## 📜 License
+## License
 
 This project is proprietary. All rights reserved.
