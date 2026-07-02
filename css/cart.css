@@ -1,0 +1,623 @@
+/* css/cart.css */
+
+/* زر السلة العائم */
+.cart-floating-btn {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    width: 60px;
+    height: 60px;
+    background: #00ffc3;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0, 255, 195, 0.4);
+    cursor: pointer;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+.cart-floating-btn:hover {
+    transform: scale(1.1);
+}
+
+.cart-floating-btn i {
+    font-size: 24px;
+    color: #121212;
+}
+
+.cart-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff4757;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* خلفية السلة */
+.cart-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1001;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* نافذة السلة الجانبية */
+.cart-sidebar {
+    position: fixed;
+    top: 0;
+    left: -400px;
+    width: 100%;
+    max-width: 400px;
+    height: 100%;
+    background: rgba(18, 18, 18, 0.85);
+    backdrop-filter: blur(15px);
+    z-index: 1002;
+    box-shadow: 5px 0 30px rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    transition: left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cart-overlay.active {
+    display: block;
+    opacity: 1;
+}
+
+.cart-sidebar.active {
+    left: 0;
+}
+
+/* رأس السلة */
+.cart-header {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-header h2 {
+    margin: 0;
+    color: #00ffc3;
+    font-size: 20px;
+}
+
+.close-cart {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* عناصر السلة */
+.cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.cart-item {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cart-item img {
+    width: 70px;
+    height: 70px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.cart-item-info {
+    flex: 1;
+}
+
+.cart-item-title {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+    color: white;
+}
+
+.cart-item-merchant {
+    margin: 0 0 5px 0;
+    font-size: 12px;
+    color: #888;
+}
+
+.cart-item-price {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #00ffc3;
+}
+
+.cart-qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cart-qty-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    width: 25px;
+    height: 25px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.cart-qty-btn:hover {
+    background: #00ffc3;
+    color: black;
+}
+
+.cart-remove-btn {
+    background: none;
+    border: none;
+    color: #ff4757;
+    cursor: pointer;
+    font-size: 18px;
+    margin-right: auto;
+}
+
+/* معلومات المستخدم والفوتر */
+.cart-footer {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: #121212;
+}
+
+.cart-input-group {
+    margin-bottom: 15px;
+}
+
+.cart-input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #aaa;
+}
+
+.cart-input-group input,
+.cart-input-group select {
+    width: 100%;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: white;
+    font-family: inherit;
+}
+
+.cart-input-group input:focus,
+.cart-input-group select:focus {
+    border-color: #00ffc3;
+    outline: none;
+}
+
+.cart-promo-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.cart-promo-row input {
+    flex: 1;
+}
+
+.cart-total-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: white;
+}
+
+.checkout-btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(45deg, #00ffc3, #00cc99);
+    color: #121212;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 255, 195, 0.3);
+}
+
+.checkout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 255, 195, 0.5);
+}
+
+.merchant-checkout-list {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.merchant-checkout-btn {
+    width: 100%;
+    padding: 12px;
+    background: #25D366;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.add-to-cart-btn {
+    width: 100%;
+    padding: 10px;
+    background: rgba(0, 255, 195, 0.1);
+    color: #00ffc3;
+    border: 1px solid #00ffc3;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.add-to-cart-btn:hover {
+    background: #00ffc3;
+    color: #121212;
+}
+
+/* ===== 🌙 الوضع الفاتح للسلة ===== */
+html.kh-light-mode .cart-sidebar {
+    background: rgba(255, 255, 255, 0.98) !important;
+    border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 5px 0 30px rgba(0, 0, 0, 0.15) !important;
+}
+
+html.kh-light-mode .cart-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+html.kh-light-mode .cart-header h2 {
+    color: #008a6a !important;
+}
+
+html.kh-light-mode .close-cart {
+    color: #1a1a1a !important;
+}
+
+html.kh-light-mode .cart-item {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+html.kh-light-mode .cart-item-title {
+    color: #1a1a1a !important;
+}
+
+html.kh-light-mode .cart-item-merchant {
+    color: #666 !important;
+}
+
+html.kh-light-mode .cart-item-price {
+    color: #008a6a !important;
+}
+
+html.kh-light-mode .cart-qty-btn {
+    background: rgba(0, 0, 0, 0.05) !important;
+    color: #1a1a1a !important;
+}
+
+html.kh-light-mode .cart-qty-btn:hover {
+    background: #008a6a !important;
+    color: white !important;
+}
+
+html.kh-light-mode .cart-qty-controls span {
+    color: #1a1a1a !important;
+}
+
+html.kh-light-mode .cart-remove-btn {
+    color: #e74c3c !important;
+}
+
+html.kh-light-mode .cart-footer {
+    background: #f7f9f7 !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+html.kh-light-mode .cart-input-group label {
+    color: #444 !important;
+}
+
+html.kh-light-mode .cart-input-group input,
+html.kh-light-mode .cart-input-group select,
+html.kh-light-mode .cart-promo-row input {
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    color: #1a1a1a !important;
+}
+
+html.kh-light-mode .cart-input-group input:focus,
+html.kh-light-mode .cart-input-group select:focus,
+html.kh-light-mode .cart-promo-row input:focus {
+    border-color: #008a6a !important;
+    outline: none !important;
+}
+
+html.kh-light-mode .cart-total-row {
+    color: #1a1a1a !important;
+}
+
+html.kh-light-mode .checkout-btn {
+    background: linear-gradient(45deg, #008a6a, #00a884) !important;
+    color: white !important;
+    box-shadow: 0 5px 15px rgba(0, 138, 106, 0.2) !important;
+}
+
+html.kh-light-mode .checkout-btn:hover {
+    box-shadow: 0 8px 25px rgba(0, 138, 106, 0.35) !important;
+}
+
+/* نافذة تعديل المنتج الجانبية والمودال */
+.cart-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.cart-modal-overlay.active {
+    display: flex;
+}
+
+.cart-modal {
+    background: #1e1e1e;
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.cart-modal h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: #00ffc3;
+}
+
+.cart-modal-item-name {
+    color: #aaa;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.cart-modal-field {
+    margin-bottom: 15px;
+}
+
+.cart-modal-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #ccc;
+}
+
+.cart-modal-field input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+    color: white;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.cart-modal-field input:focus {
+    border-color: #00ffc3;
+    outline: none;
+}
+
+.cart-modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.cart-modal-btn-save {
+    flex: 1;
+    padding: 11px;
+    background: #00ffc3;
+    color: #121212;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.cart-modal-btn-save:hover {
+    background: #00cc99;
+    transform: translateY(-1px);
+}
+
+.cart-modal-btn-cancel {
+    flex: 1;
+    padding: 11px;
+    background: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.cart-modal-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Light Mode overrides for edit modal */
+html.kh-light-mode .cart-modal {
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    color: #1a1a1a !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+html.kh-light-mode .cart-modal h3 {
+    color: #008a6a !important;
+}
+
+html.kh-light-mode .cart-modal-item-name {
+    color: #666 !important;
+}
+
+html.kh-light-mode .cart-modal-field label {
+    color: #444 !important;
+}
+
+html.kh-light-mode .cart-modal-field input {
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+}
+
+html.kh-light-mode .cart-modal-field input:focus {
+    border-color: #008a6a !important;
+}
+
+html.kh-light-mode .cart-modal-btn-save {
+    background: #008a6a !important;
+    color: white !important;
+}
+
+html.kh-light-mode .cart-modal-btn-save:hover {
+    background: #007056 !important;
+}
+
+html.kh-light-mode .cart-modal-btn-cancel {
+    color: #1a1a1a !important;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    background: transparent !important;
+}
+
+html.kh-light-mode .cart-modal-btn-cancel:hover {
+    background: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* ===== 💳 حقول وأزرار الدفع بالرصيد في السلة ===== */
+.cart-dcb-fields {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+}
+
+.cart-dcb-fields h4 {
+    margin: 0 0 12px 0;
+    color: #00ffc3;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dcb-eligibility-msg {
+    font-size: 12px;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.checkout-btn.cod-btn {
+    background: #1a1e22;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: none;
+}
+
+.checkout-btn.cod-btn:hover {
+    background: #24292f;
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.checkout-btn.dcb-btn {
+    background: linear-gradient(45deg, #00ffc3, #00cc99);
+    color: #121212;
+    border: none;
+}
+
+/* Light Mode Overrides */
+html.kh-light-mode .cart-dcb-fields {
+    background: rgba(0, 0, 0, 0.02) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+html.kh-light-mode .cart-dcb-fields h4 {
+    color: #008a6a !important;
+}
+
+html.kh-light-mode .checkout-btn.cod-btn {
+    background: #f1f2f6 !important;
+    color: #2f3542 !important;
+    border: 1px solid #ced6e0 !important;
+}
+
+html.kh-light-mode .checkout-btn.cod-btn:hover {
+    background: #e1e2e6 !important;
+}
+
+html.kh-light-mode .checkout-btn.dcb-btn {
+    background: linear-gradient(45deg, #008a6a, #00a884) !important;
+    color: white !important;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease forwards;
+}
+

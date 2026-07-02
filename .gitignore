@@ -1,0 +1,35 @@
+# --- Node / tooling ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- Environment / secrets ---
+.env
+.env.*
+*.env
+
+# --- OS generated ---
+.DS_Store
+Thumbs.db
+desktop.ini
+Desktop.ini
+
+# --- Editor ---
+.vscode/settings.json
+*.swp
+*.swo
+*~
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Build artefacts ---
+dist/
+build/
+.cache/
+
+# --- Private / sensitive files ---
+# Uncomment the next line if you want to keep the SQL schema private
+# kolchhna_database.sql

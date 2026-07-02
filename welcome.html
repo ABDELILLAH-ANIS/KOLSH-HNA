@@ -1,0 +1,249 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="welcomePageTitle" data-key="welcome_title">مرحباً بك - كلش هنا</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gumela&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Gumela', sans-serif;
+            background: linear-gradient(160deg, #161b16, #1c221c);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .welcome-container {
+            background: rgba(42, 42, 42, 0.9);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            border: 1px solid rgba(0, 255, 195, 0.3);
+            animation: fadeIn 0.8s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .success-icon {
+            font-size: 80px;
+            color: #00ffc3;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+        
+        h1 {
+            color: #00ffc3;
+            margin-bottom: 20px;
+        }
+        
+        .message-box {
+            background: rgba(0, 255, 195, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: inherit;
+        }
+        
+        .next-steps {
+            background: rgba(189, 0, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: inherit;
+        }
+        
+        .contact-info {
+            background: rgba(255, 193, 7, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: inherit;
+        }
+        
+        .btn {
+            background: #00ffc3;
+            color: black;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            font-family: inherit;
+        }
+        
+        .btn:hover {
+            background: #00e6b0;
+            transform: translateY(-3px);
+        }
+
+        /* مبدل اللغة */
+        .lang-switcher {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 8px;
+        }
+        .lang-btn {
+            padding: 7px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(0,255,195,0.3);
+            background: rgba(255,255,255,0.07);
+            color: white;
+            font-family: 'Gumela', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .lang-btn:hover { background: rgba(0,255,195,0.15); border-color: #00ffc3; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* LTR/RTL support overrides */
+        html[dir="ltr"] .message-box, 
+        html[dir="ltr"] .next-steps, 
+        html[dir="ltr"] .contact-info {
+            text-align: left;
+        }
+        html[dir="rtl"] .message-box, 
+        html[dir="rtl"] .next-steps, 
+        html[dir="rtl"] .contact-info {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-switcher">
+        <button class="lang-btn">العربية</button>
+        <button class="lang-btn">Français</button>
+        <button class="lang-btn">English</button>
+    </div>
+
+    <div class="welcome-container">
+        <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <h1 id="welcomeHeader" data-key="welcome_header">مرحباً بك في كلش هنا!</h1>
+        
+        <div class="message-box">
+            <h3 id="welcomeBoxTitle" data-key="welcome_box_title">تم إنشاء حسابك بنجاح</h3>
+            <p id="welcomeBoxDesc" data-key="welcome_box_desc">شكراً لك على اختيارك منصة "كلش هنا". نحن سعداء بانضمامك إلينا.</p>
+            <div id="summaryDetails" style="display: none; margin-top: 15px; border-top: 1px dashed rgba(0, 255, 195, 0.3); padding-top: 15px; text-align: inherit;">
+                <p style="margin: 6px 0; font-size: 14px;"><strong id="summaryPlanLabel">الباقة المختارة:</strong> <span id="summaryPlanVal" style="color: #00ffc3; font-weight: bold;">-</span></p>
+                <p style="margin: 6px 0; font-size: 14px;"><strong id="summaryRoleLabel">نوع الحساب:</strong> <span id="summaryRoleVal" style="color: #00ffc3; font-weight: bold;">-</span></p>
+            </div>
+        </div>
+        
+        <div class="next-steps">
+            <h3 id="welcomeStepsTitle" data-key="welcome_steps_title">الخطوات التالية:</h3>
+            <p id="welcomeStep1" data-key="welcome_step_1">1. تحقق من بريدك الإلكتروني للرسالة التفعيلية</p>
+            <p id="welcomeStep2" data-key="welcome_step_2">2. سيتم التواصل معك خلال 24 ساعة لتأكيد الدفع</p>
+            <p id="welcomeStep3" data-key="welcome_step_3">3. بعد تأكيد الدفع، سيتم تفعيل حسابك بالكامل</p>
+        </div>
+        
+        <div class="contact-info">
+            <h3 id="welcomeContactTitle" data-key="welcome_contact_title">للتواصل:</h3>
+            <p id="welcomeContactEmail" data-key="welcome_contact_email">البريد الإلكتروني: support@kolshihena.com</p>
+            <p id="welcomeContactPhone" data-key="welcome_contact_phone">رقم الهاتف: 000000000</p>
+            <p id="welcomeContactHours" data-key="welcome_contact_hours">ساعات العمل: 9:00 صباحاً - 5:00 مساءً</p>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="login.html" class="btn" id="welcomeLoginBtn" data-key="welcome_login_btn">🔐 تسجيل الدخول</a>
+            <a href="index.html" class="btn" id="welcomeHomeBtn" data-key="welcome_home_btn" style="background: transparent; border: 1px solid #00ffc3; color: white;">🏠 الصفحة الرئيسية</a>
+        </div>
+    </div>
+
+    <!-- ملفات الترجمة -->
+    <script src="js/translations-signup.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof setPageDirection === 'function') setPageDirection();
+            if (typeof applyTranslations === 'function') applyTranslations();
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const map = { 'العربية': 'ar', 'English': 'en', 'Français': 'fr' };
+                    const lang = map[this.textContent.trim()] || 'ar';
+                    switchLanguage(lang);
+                });
+            });
+        });
+
+        function switchLanguage(lang) {
+            localStorage.setItem('appLanguage', lang);
+            localStorage.setItem('lang', lang);
+            localStorage.setItem('packageLang', lang);
+            location.reload();
+        }
+
+        function applyTranslations() {
+            if (typeof translate !== 'function') return;
+            const safe = (id, key) => {
+                const el = document.getElementById(id);
+                const t = translate(key);
+                if (el && t) el.textContent = t;
+            };
+            safe('welcomePageTitle', 'welcome_title');
+            safe('welcomeHeader', 'welcome_header');
+            safe('welcomeBoxTitle', 'welcome_box_title');
+            safe('welcomeBoxDesc', 'welcome_box_desc');
+            safe('welcomeStepsTitle', 'welcome_steps_title');
+            safe('welcomeStep1', 'welcome_step_1');
+            safe('welcomeStep2', 'welcome_step_2');
+            safe('welcomeStep3', 'welcome_step_3');
+            safe('welcomeContactTitle', 'welcome_contact_title');
+            safe('welcomeContactEmail', 'welcome_contact_email');
+            safe('welcomeContactPhone', 'welcome_contact_phone');
+            safe('welcomeContactHours', 'welcome_contact_hours');
+            safe('welcomeLoginBtn', 'welcome_login_btn');
+            safe('welcomeHomeBtn', 'welcome_home_btn');
+
+            // Translate Summary labels
+            const summaryPlanLabel = document.getElementById('summaryPlanLabel');
+            if (summaryPlanLabel) summaryPlanLabel.textContent = translate('plan_label').replace('•', '').trim();
+            const summaryRoleLabel = document.getElementById('summaryRoleLabel');
+            if (summaryRoleLabel) summaryRoleLabel.textContent = translate('role_selector_label').replace('•', '').trim() + ':';
+
+            // Show summary values
+            try {
+                const details = JSON.parse(localStorage.getItem('lastSignupDetails'));
+                if (details) {
+                    const summaryDiv = document.getElementById('summaryDetails');
+                    const planValEl = document.getElementById('summaryPlanVal');
+                    const roleValEl = document.getElementById('summaryRoleVal');
+                    
+                    if (summaryDiv && planValEl && roleValEl) {
+                        const planNameKey = `plan_names.${details.plan.toLowerCase()}`;
+                        const planPeriodTranslated = details.isYearly ? translate('plan_yearly') : translate('plan_monthly');
+                        planValEl.textContent = `${translate(planNameKey)} (${planPeriodTranslated})`;
+                        roleValEl.textContent = translate(`role_${details.role}_name`);
+                        summaryDiv.style.display = 'block';
+                    }
+                }
+            } catch (e) {
+                console.warn("Failed to load last signup details:", e);
+            }
+        }
+    </script>
+</body>
+</html>

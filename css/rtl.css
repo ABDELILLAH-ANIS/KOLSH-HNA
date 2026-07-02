@@ -1,0 +1,212 @@
+/* css/rtl.css */
+/* إعدادات اللغة والاتجاه */
+
+/* اتجاهات للغة العربية */
+.lang-ar body,
+[dir="rtl"] body {
+    font-family: 'Gumela', sans-serif;
+    text-align: right;
+    direction: rtl;
+}
+
+/* اتجاهات للغة الإنجليزية */
+.lang-en body,
+[dir="ltr"] body {
+    font-family: 'Gumela', 'Arial', sans-serif;
+    text-align: left;
+    direction: ltr;
+}
+
+/* اتجاهات للغة الفرنسية */
+.lang-fr body {
+    font-family: 'Gumela', 'Arial', sans-serif;
+    text-align: left;
+    direction: ltr;
+}
+
+/* تبديل اللغة */
+.lang-switcher {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    gap: 10px;
+}
+
+.lang-ar .lang-switcher {
+    right: auto;
+    left: 20px;
+}
+
+.lang-btn {
+    background: rgba(0, 255, 195, 0.1);
+    border: 1px solid #00ffc3;
+    color: #00ffc3;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.3s;
+}
+
+.lang-btn:hover {
+    background: rgba(0, 255, 195, 0.2);
+    transform: scale(1.05);
+}
+
+/* زر العودة */
+.lang-ar .back-btn {
+    left: auto;
+    right: 20px;
+}
+
+.lang-en .back-btn,
+.lang-fr .back-btn {
+    right: auto;
+    left: 20px;
+}
+
+/* نموذج التسجيل */
+.lang-ar .form-label {
+    text-align: right;
+    margin-left: 0;
+    margin-right: 8px;
+}
+
+.lang-en .form-label,
+.lang-fr .form-label {
+    text-align: left;
+    margin-right: 0;
+    margin-left: 8px;
+}
+
+/* مجموعة رقم الهاتف */
+.lang-ar .phone-input-group {
+    flex-direction: row;
+}
+
+.lang-en .phone-input-group,
+.lang-fr .phone-input-group {
+    flex-direction: row;
+}
+
+.lang-ar .country-code {
+    border-radius: 0 8px 8px 0;
+    border-left: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lang-en .country-code,
+.lang-fr .country-code {
+    border-radius: 8px 0 0 8px;
+    border-right: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lang-ar .phone-number {
+    border-radius: 8px 0 0 8px;
+    border-right: none;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lang-en .phone-number,
+.lang-fr .phone-number {
+    border-radius: 0 8px 8px 0;
+    border-left: none;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* الإشعارات */
+.lang-ar .notification {
+    right: 20px;
+    left: auto;
+    text-align: right;
+}
+
+.lang-en .notification,
+.lang-fr .notification {
+    left: 20px;
+    right: auto;
+    text-align: left;
+}
+
+/* الأدوات المساعدة */
+.tooltip {
+    margin-right: 8px;
+}
+
+.lang-en .tooltip,
+.lang-fr .tooltip {
+    margin-right: 0;
+    margin-left: 8px;
+}
+
+/* الأزرار الاجتماعية */
+.lang-ar .social-btn {
+    text-align: right;
+    padding-right: 15px;
+    padding-left: 45px;
+}
+
+.lang-en .social-btn,
+.lang-fr .social-btn {
+    text-align: left;
+    padding-left: 15px;
+    padding-right: 45px;
+}
+
+/* الروابط */
+.lang-ar a {
+    float: right;
+}
+
+.lang-en a,
+.lang-fr a {
+    float: left;
+}
+
+/* إشعار الدفع */
+.lang-ar .payment-notice {
+    text-align: right;
+}
+
+.lang-en .payment-notice,
+.lang-fr .payment-notice {
+    text-align: left;
+}
+
+/* تلميحات الأدوات */
+.tooltip[title] {
+    position: relative;
+    cursor: help;
+}
+
+.tooltip[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px;
+    border-radius: 6px;
+    white-space: pre-wrap;
+    min-width: 200px;
+    max-width: 300px;
+    z-index: 1000;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+.lang-ar .tooltip[title]:hover::after {
+    text-align: right;
+    direction: rtl;
+}
+
+.lang-en .tooltip[title]:hover::after,
+.lang-fr .tooltip[title]:hover::after {
+    text-align: left;
+    direction: ltr;
+}

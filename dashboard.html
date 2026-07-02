@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-key="dashboard_title">لوحة تحكم التاجر - كلش هنا</title>
+  
+  <!-- الخطوط -->
+  <link href="https://fonts.googleapis.com/css2?family=Gumela&display=swap" rel="stylesheet" />
+  
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/dashboard.css">
+
+  <style>
+    /* add-btn-main style */
+    .add-btn-main {
+      background: var(--neon-green);
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      font-family: 'Gumela', sans-serif;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+    .add-btn-main:hover { background: #00e6b0; transform: translateY(-2px); }
+    .add-btn-main:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    /* product card extras */
+    .product-info { padding: 12px; }
+    .product-name { font-size: 14px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .product-desc { font-size: 12px; color: #aaa; margin-bottom: 8px; }
+    .product-price { color: var(--neon-green); font-weight: bold; }
+    .product-date { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.6); color: #aaa; font-size: 10px; padding: 2px 6px; border-radius: 6px; }
+    .product-image-container { position: relative; }
+    .edit-btn, .view-btn, .delete-btn {
+      flex: 1; padding: 6px; border-radius: 8px; border: none; cursor: pointer;
+      font-size: 16px; transition: all 0.2s; background: rgba(255,255,255,0.05);
+    }
+    .edit-btn:hover { background: rgba(0,212,255,0.2); }
+    .view-btn:hover { background: rgba(0,255,195,0.15); }
+    .delete-btn:hover { background: rgba(255,71,87,0.2); }
+    /* pagination */
+    #paginationContainer { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
+    .pagination-btn { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: 'Gumela', sans-serif; transition: all 0.2s; }
+    .pagination-btn:hover:not(:disabled) { background: rgba(0,255,195,0.15); border-color: var(--neon-green); }
+    .pagination-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .page-info { color: #aaa; font-size: 13px; }
+    .page-buttons { display: flex; gap: 4px; }
+    .page-btn { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-family: 'Gumela', sans-serif; transition: all 0.2s; }
+    .page-btn.active { background: var(--neon-green); color: #000; border-color: var(--neon-green); }
+    /* search bar */
+    .search-container { margin-bottom: 20px; }
+    .search-input { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-family: 'Gumela', sans-serif; font-size: 14px; transition: all 0.3s; }
+    .search-input:focus { outline: none; border-color: var(--neon-green); box-shadow: 0 0 0 2px rgba(0,255,195,0.1); }
+    .loading-products { grid-column: 1/-1; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 60px 0; color: #aaa; }
+    .spinner.small { width: 30px; height: 30px; border-width: 3px; margin-bottom: 0; }
+
+    /* filters tabs */
+    .product-filter-tabs {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .filter-tab-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #aaa;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Gumela', sans-serif;
+      font-size: 13px;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+    .filter-tab-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+    }
+    .filter-tab-btn.active {
+      background: var(--neon-green);
+      border-color: var(--neon-green);
+      color: #000;
+    }
+  </style>
+  
+  <!-- الأيقونات -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    /* أنيميشنات إضافية */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .dashboard-content {
+      animation: fadeIn 0.5s ease;
+    }
+    
+    /* تخصيصات إضافية */
+    .action-btn i, .menu-btn i {
+      margin-left: 5px;
+    }
+
+    /* بطاقة رابط المتجر */
+    .store-link-card {
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      border: 1px solid rgba(0,255,195,0.25);
+      border-radius: 16px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .store-link-card .link-icon {
+      font-size: 28px;
+      color: #00ffc3;
+    }
+    .store-link-card .link-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .store-link-card .link-info p {
+      font-size: 12px;
+      color: #aaa;
+      margin: 0 0 4px;
+    }
+    .store-link-card .link-url {
+      font-size: 13px;
+      color: #00ffc3;
+      font-family: monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+    .store-link-card .link-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .copy-link-btn {
+      background: rgba(0,255,195,0.15);
+      border: 1px solid #00ffc3;
+      color: #00ffc3;
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .copy-link-btn:hover { background: rgba(0,255,195,0.3); }
+    .copy-link-btn.copied { background: rgba(0,255,195,0.3); color: #00ff88; }
+    .open-store-btn {
+      background: #00ffc3;
+      border: none;
+      color: #000;
+      padding: 8px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+      font-weight: bold;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+    .open-store-btn:hover { background: #00e6af; }
+
+    /* حقول التواصل */
+    .social-section-title {
+      font-size: 13px;
+      color: #aaa;
+      margin: 18px 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .social-input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .social-input-row .social-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .social-icon.ig  { background: #833ab4; color: #fff; }
+    .social-icon.fb  { background: #1877f2; color: #fff; }
+    .social-icon.tk  { background: #010101; color: #fff; border: 1px solid #333; }
+    .social-icon.wa  { background: #25d366; color: #fff; }
+    .social-icon.web { background: #2c5364; color: #00ffc3; }
+    .social-input-row input {
+      flex: 1;
+    }
+
+    
+    /* تحسينات للنوافذ المنبثقة */
+    .modal-content h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: center;
+    }
+    
+    .modal-content h3 i {
+      font-size: 24px;
+    }
+    
+    /* تحسينات للأزرار */
+    .btn i {
+      margin-left: 8px;
+    }
+    
+    /* القائمة المنسدلة — تظهر من اليسار (الزر في اليسار) */
+    .menu-dropdown { position: relative; }
+    .menu-items {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: auto;
+      background: rgba(14,18,14,0.97);
+      border: 1px solid rgba(0,255,195,0.25);
+      border-radius: 14px;
+      min-width: 200px;
+      padding: 8px;
+      z-index: 9999;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+      backdrop-filter: blur(20px);
+      flex-direction: column;
+      gap: 4px;
+    }
+    .menu-items.show {
+      display: flex;
+      animation: menuSlideIn 0.2s ease;
+    }
+    @keyframes menuSlideIn {
+      from { opacity:0; transform: translateY(-8px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .menu-items button {
+      background: transparent;
+      border: none;
+      color: #e0e0e0;
+      padding: 11px 15px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      text-align: right;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.15s;
+    }
+    .menu-items button:hover { background: rgba(0,255,195,0.08); color:#00ffc3; }
+
+    /* ===== نافذة ترقية الباقة - تصميم مطابق لصفحة الباقات ===== */
+    #upgradePlanModal .modal-content {
+      max-width: 860px;
+      width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: linear-gradient(160deg, #161b16, #1c221c);
+    }
+    #upgradePlanModal h3 {
+      color: #00ffc3;
+      font-size: 22px;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .upgrade-billing-toggle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: center;
+      margin: 16px 0 20px;
+      background: rgba(255,255,255,0.05);
+      padding: 8px 20px;
+      border-radius: 50px;
+      border: 1px solid rgba(0,255,195,0.3);
+      font-size: 14px;
+    }
+    .upgrade-billing-toggle .switch { position:relative; display:inline-block; width:46px; height:22px; }
+    .upgrade-billing-toggle .switch input { opacity:0; width:0; height:0; }
+    .upgrade-billing-toggle .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#444; transition:.4s; border-radius:34px; }
+    .upgrade-billing-toggle .slider:before { position:absolute; content:""; height:14px; width:14px; left:4px; bottom:4px; background:#00ffc3; transition:.4s; border-radius:50%; }
+    .upgrade-billing-toggle input:checked + .slider { background:#1a1a1a; }
+    .upgrade-billing-toggle input:checked + .slider:before { transform:translateX(24px); }
+    .upgrade-plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .up-plan-card {
+      background: #2a2a2a;
+      border-radius: 18px;
+      padding: 24px 20px;
+      text-align: center;
+      border: 2px solid rgba(255,255,255,0.08);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .up-plan-card:hover {
+      border-color: #00ffc3;
+      transform: translateY(-6px);
+      box-shadow: 0 10px 30px rgba(0,255,195,0.15);
+    }
+    .up-plan-card.selected {
+      border-color: #00ffc3;
+      box-shadow: 0 0 25px rgba(0,255,195,0.4), inset 0 0 20px rgba(0,255,195,0.07);
+      transform: translateY(-6px) scale(1.02);
+    }
+    .up-plan-card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: -10px; right: -10px;
+      background: #00ffc3;
+      color: #000;
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 15px;
+    }
+    .up-plan-card.hidden { display: none; }
+    .up-plan-card .up-badge {
+      background: #00ffc3;
+      color: #000;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      position: absolute;
+      top: 12px; left: 12px;
+    }
+    .up-plan-name { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+    .up-plan-price {
+      font-size: 36px;
+      font-weight: 700;
+      color: #00ffc3;
+      text-shadow: 0 0 12px rgba(0,255,195,0.4);
+      margin: 12px 0;
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 6px;
+    }
+    .up-plan-price span { font-size: 16px; color: #aaa; font-weight: normal; }
+    .up-plan-features { list-style: none; padding: 0; margin: 12px 0; text-align: right; }
+    .up-plan-features li { padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+    .up-plan-features li::before { content: "✔"; color: #00ffc3; margin-left: 8px; }
+    .up-plan-card .up-select-btn {
+      background: linear-gradient(145deg, #00ffc3, #00e6b0);
+      color: #000;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      width: 100%;
+      font-family: inherit;
+      font-size: 14px;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+    .up-plan-card.selected .up-select-btn {
+      background: linear-gradient(145deg, #bd00ff, #9b00d6);
+      color: white;
+    }
+    .upgrade-send-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #00ffc3, #00c99a);
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+      margin-top: 6px;
+    }
+    .upgrade-send-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .upgrade-send-btn:not(:disabled):hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,255,195,0.3); }
+
+    @media print {
+      body * { visibility: hidden; }
+      #invoicePrintArea, #invoicePrintArea * { visibility: visible; }
+      #invoicePrintArea { position: absolute; left: 0; top: 0; width: 100%; direction: rtl; }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="dashboard-body">
+
+  <!-- مبدّل اللغة محذوف -->
+
+  <div id="loading" class="full-page-loading">
+    <div class="spinner"></div>
+    <p data-key="syncing_data">جاري مزامنة بيانات متجرك...</p>
+  </div>
+
+  <!-- شاشة الانتظار وتأكيد الدفع -->
+  <div id="pendingOverlay" class="pending-overlay" style="display: none;">
+    <div class="pending-content">
+      <i class="fas fa-hourglass-half pending-icon"></i>
+      <h2>حسابك قيد الانتظار</h2>
+      <p>لم يتم تفعيل باقتك بعد. الرجاء إرفاق وصل الدفع (CCP أو BaridiMob) ليتم مراجعته وتفعيل المتجر الخاص بك.</p>
+      
+      <div class="discount-banner">
+        <i class="fas fa-tags"></i>
+        <span><strong>عرض خاص:</strong> خصم 25% عند الدفع السنوي بالدولار (USD) أو اليورو (EUR). تواصل معنا للحصول على العرض!</span>
+      </div>
+
+      <div class="receipt-upload-box">
+        <label for="receiptUpload" class="receipt-label">
+          <i class="fas fa-cloud-upload-alt"></i> إرفاق صورة الوصل
+        </label>
+        <input type="file" id="receiptUpload" accept="image/*" style="display:none;" onchange="handleReceiptUpload(this)">
+        <p id="receiptFileName" class="file-name"></p>
+        <button id="submitReceiptBtn" class="submit-receipt-btn" onclick="submitReceipt()" disabled>إرسال للمراجعة</button>
+      </div>
+      
+      <div class="contact-support">
+        <p>هل تحتاج إلى مساعدة؟ <a href="https://wa.me/213000000000" target="_blank">تواصل مع الدعم الفني</a></p>
+      </div>
+
+      <button class="logout-btn-pending" onclick="logout()">تسجيل الخروج</button>
+    </div>
+  </div>
+
+  <div class="dashboard-wrapper">
+    <!-- العمود الجانبي (Sidebar) -->
+    <aside class="dashboard-sidebar">
+      <div class="sidebar-logo">
+        <img id="sidebarLogoImg" src="images/placeholder.png" alt="Logo">
+      </div>
+      
+      <div class="sidebar-actions">
+        <button class="pill-btn package-btn" onclick="showUpgradeModal()" data-key="upgrade_btn">
+          <i class="fas fa-rocket"></i> ترقية الباقة
+        </button>
+        <button class="pill-btn" onclick="switchDashboardSection('productsSection')">
+          <i class="fas fa-boxes"></i> <span>المنتجات</span>
+        </button>
+        <button class="pill-btn" onclick="switchDashboardSection('ordersSection')">
+          <i class="fas fa-box-open"></i> <span>الطلبات</span>
+        </button>
+        <button class="pill-btn" onclick="switchDashboardSection('couponsSection')">
+          <i class="fas fa-ticket-alt"></i> <span>الكوبونات</span>
+        </button>
+        <button class="pill-btn" id="btnSupplierDeals" onclick="switchDashboardSection('supplierDealsSection')" style="display: none;">
+          <i class="fas fa-handshake"></i> <span>صفقات الموردين B2B</span>
+        </button>
+        <button class="pill-btn" onclick="switchDashboardSection('dcbSection')">
+          <i class="fas fa-mobile-alt"></i> <span>الدفع بالرصيد (DCB)</span>
+        </button>
+        <button class="pill-btn settings-btn" onclick="toggleProfile()" data-key="settings">
+          <i class="fas fa-cog"></i> الإعدادات
+        </button>
+      </div>
+      
+      <!-- صندوق الإحصائيات العمودي -->
+      <div class="sidebar-stats">
+        <h3 data-key="statistics_title">الإحصائيات والبيانات</h3>
+        
+        <p><i class="fas fa-chart-line"></i> <span data-key="plan_usage">المنتجات:</span> <strong id="productUsageCount">0</strong> / <span id="productLimitDisplay">5</span></p>
+        <p><i class="fas fa-clock"></i> <strong id="daysLeftDisplay">--</strong></p>
+
+        <div class="stat-item">
+          <span class="stat-label" data-key="sub_status">حالة الحساب</span>
+          <span class="stat-value" id="subExpiry">--</span>
+          <div class="usage-bar-container"><div id="usageBar" class="usage-bar"></div></div>
+          <small id="usageText">--</small>
+        </div>
+        
+        <div class="stat-item">
+          <span class="stat-label" data-key="total_visitors">إجمالي الزوار</span>
+          <span class="stat-value highlight" id="visitorCount">0</span>
+        </div>
+        
+        <div class="store-link-mini">
+           <p>رابط المتجر:</p>
+           <a href="#" id="sidebarStoreLink" target="_blank" class="link-url">جاري التحميل...</a>
+           <button class="copy-mini-btn" onclick="copyStoreLink()"><i class="fas fa-copy"></i> نسخ</button>
+        </div>
+      </div>
+
+      <div class="sidebar-footer" style="margin-top: auto; padding-top: 20px; display: flex; flex-direction: column; gap: 12px; border-top: 1px solid rgba(255,255,255,0.05);">
+        <button class="pill-btn logout-btn" onclick="window.logout()">
+          <i class="fas fa-sign-out-alt"></i> <span>تسجيل الخروج</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- المنطقة الرئيسية (Main Area) -->
+    <main class="dashboard-main-area">
+      <!-- شريط اسم المتجر والقائمة العلوية -->
+      <header class="dashboard-top-bar">
+        <div class="store-name-badge">
+          <span id="planBadge" class="plan-badge">--</span>
+          <h1 id="merchantName">اسم المتجر</h1>
+        </div>
+        <div class="top-bar-menu">
+          <button class="view-store-btn" onclick="openStorePage()">
+            <i class="fas fa-external-link-alt"></i> مشاهدة المتجر
+          </button>
+        </div>
+      </header>
+
+      <div class="dashboard-sections-container">
+        
+        <!-- ================= قسم المنتجات ================= -->
+        <div id="productsSection" class="dashboard-tab-section active">
+          <section class="products-section dashboard-box">
+          <div class="section-header">
+            <h2 data-key="my_products"><i class="fas fa-box-open"></i> المنتجات</h2>
+            <button class="add-btn-main" id="mainAddBtn" onclick="window.showAddProductForm()" data-key="add_product">
+              <i class="fas fa-plus"></i> إضافة منتج
+            </button>
+          </div>
+          <!-- شريط البحث وتصنيف المنتجات -->
+          <!-- حقول وهمية لمنع التعبئة التلقائية من المتصفح (autofill trap) -->
+          <div style="height:0;overflow:hidden;position:absolute;" aria-hidden="true">
+            <input type="text" tabindex="-1" autocomplete="username">
+            <input type="password" tabindex="-1" autocomplete="current-password">
+          </div>
+          <div class="search-container" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+            <input type="search" class="search-input" id="searchInput" placeholder="🔍 ابحث عن منتج..." oninput="debounceSearch(this.value)" autocomplete="new-password" name="product-search-do-not-fill">
+            
+            <div id="wholesalerProductFilters" class="product-filter-tabs" style="display: none;">
+              <button id="filterBtnAll" class="filter-tab-btn active" onclick="switchProductFilter('all')">كل المنتجات</button>
+              <button id="filterBtnRetail" class="filter-tab-btn" onclick="switchProductFilter('retail')">منتجات التجزئة (B2C)</button>
+              <button id="filterBtnWholesale" class="filter-tab-btn" onclick="switchProductFilter('wholesale')">منتجات الجملة (B2B)</button>
+            </div>
+          </div>
+          <div class="products-grid" id="productsGrid">
+            <!-- المنتجات ستضاف هنا ديناميكياً -->
+          </div>
+          <!-- Pagination -->
+          <div id="paginationContainer"></div>
+        </section>
+
+        <!-- ميزات الـ Premium و VIP المخفية (تظهر حسب الباقة) -->
+        <section id="premiumFeatureBox" class="dashboard-box" style="display:none;">
+          <h3 data-key="manual_sales_title"><i class="fas fa-hand-holding-usd"></i> إحصاء المبيعات للزبائن</h3>
+          <p data-key="manual_sales_desc">العدد الذي تدخله هنا سيظهر في سلة زبائنك لزيادة الثقة.</p>
+          <div class="input-action-group">
+            <input type="number" id="manualSalesInput" placeholder="0" min="0" style="padding: 10px; border-radius:8px; border:none;">
+            <button onclick="updateManualSales()" class="add-btn-main" data-key="update_btn">تحديث</button>
+          </div>
+        </section>
+
+        <section id="vipAnalyticsBox" class="dashboard-box" style="display:none;">
+          <h3 data-key="vip_analytics_title"><i class="fas fa-chart-bar"></i> التحليلات الشاملة (VIP)</h3>
+          <div class="analytics-mini-grid">
+            <p>أكثر المناطق: <strong id="topRegions">--</strong></p>
+            <p>وقت الذروة: <strong id="peakTime">--</strong></p>
+          </div>
+        </section>
+
+        <!-- صندوق الإعلان المخصص -->
+        <section class="custom-ad-section dashboard-box vip-locked" id="customAdSection">
+          <h3>الاعلان المخصص ( يفتح عند تطوير ال VIP )</h3>
+          <p>مساحة إعلانية لمتجرك تظهر للزوار في الصفحة الرئيسية</p>
+        </section>
+        </section>
+        </div> <!-- End productsSection -->
+
+        <!-- ================= قسم الطلبات ================= -->
+        <div id="ordersSection" class="dashboard-tab-section" style="display:none;">
+          <section class="dashboard-box">
+            <h2><i class="fas fa-box-open"></i> الطلبات</h2>
+            <div class="table-wrapper" style="margin-top:20px; overflow-x:auto;">
+              <table id="merchantOrdersTable" style="width:100%; border-collapse:collapse; text-align:right;">
+                <thead>
+                  <tr style="border-bottom:1px solid rgba(255,255,255,0.1);">
+                    <th style="padding:10px;">رقم الطلب</th>
+                    <th style="padding:10px;">العميل</th>
+                    <th style="padding:10px;">نوع الطلب</th>
+                    <th style="padding:10px;">المجموع الكلي</th>
+                    <th style="padding:10px;">العربون</th>
+                    <th style="padding:10px;">عربون للمنصة</th>
+                    <th style="padding:10px;">الحالة</th>
+                    <th style="padding:10px;">تاريخ الطلب</th>
+                    <th style="padding:10px;">إجراءات</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Orders go here -->
+                </tbody>
+              </table>
+              <div id="noOrdersMsg" style="text-align:center; padding:30px; color:#aaa; display:none;">
+                لا توجد طلبات حتى الآن.
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ================= قسم الكوبونات ================= -->
+        <div id="couponsSection" class="dashboard-tab-section" style="display:none;">
+          <section class="dashboard-box">
+            <h2><i class="fas fa-ticket-alt"></i> كوبونات الخصم</h2>
+            <p style="color:#aaa; margin-bottom:20px;">قم بتفعيل كود خصم لزبائنك لاستخدامه عند الطلب.</p>
+            <div class="form-group" style="max-width:400px;">
+              <label>كود الكوبون</label>
+              <input type="text" id="couponCodeInput" placeholder="مثال: WINTER20" style="width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.2); color:#fff; margin-bottom:15px;">
+              
+              <label>نسبة الخصم (%)</label>
+              <select id="couponDiscountInput" style="width:100%; padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.2); color:#fff; margin-bottom:20px;">
+                <option value="0">بدون خصم</option>
+                <option value="5">5%</option>
+                <option value="10">10%</option>
+                <option value="15">15%</option>
+                <option value="20">20%</option>
+                <option value="25">25%</option>
+                <option value="30">30%</option>
+                <option value="40">40%</option>
+                <option value="50">50%</option>
+              </select>
+              
+              <button class="add-btn-main" onclick="saveCouponSettings()">حفظ الإعدادات</button>
+            </div>
+          </section>
+        </div>
+
+        <!-- ================= قسم الدفع بالرصيد (DCB) ================= -->
+        <div id="dcbSection" class="dashboard-tab-section" style="display:none;">
+          <section class="dashboard-box">
+            <h2><i class="fas fa-mobile-alt"></i> الدفع بالرصيد (DCB)</h2>
+            <p style="color:#aaa; margin-bottom:20px;">قم بإدارة وتفعيل خيار الدفع عبر رصيد الهاتف لزبائن متجرك.</p>
+            
+            <!-- إعدادات تفعيل التاجر -->
+            <div class="card" style="margin-bottom: 25px; padding: 20px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(0, 255, 195, 0.15);">
+              <h3 style="color: var(--neon-green, #00ffc3); margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-cog"></i> إعدادات الخدمة لمتجري
+              </h3>
+              
+              <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #fff;">
+                  <input type="checkbox" id="vendorDcbEnabled" style="width: auto; height: auto;">
+                  <span>تفعيل الدفع بالرصيد لمنتجاتي</span>
+                </label>
+              </div>
+              
+              <div class="form-group" style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: #fff;">الحد الأقصى للطلب بالرصيد (دج) (اختياري)</label>
+                <input type="number" id="vendorDcbMaxLimit" placeholder="اتركه فارغاً لاستخدام الحد الأقصى للمنصة" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: #fff;">
+                <small style="color: #aaa; display: block; margin-top: 5px;">يمكنك تعيين حد أقصى مخصص لمتجرك لتقليل المخاطر.</small>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 20px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #fff;">
+                  <input type="checkbox" id="vendorDcbAutoAccept" style="width: auto; height: auto;">
+                  <span>قبول وتأكيد الطلبات المدفوعة بالرصيد تلقائياً</span>
+                </label>
+              </div>
+
+              <button class="add-btn-main" onclick="saveVendorDCBSettings()">
+                <i class="fas fa-save"></i> حفظ إعدادات DCB
+              </button>
+            </div>
+
+            <!-- جدول المعاملات -->
+            <div class="card" style="padding: 20px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(0, 255, 195, 0.15);">
+              <h3 style="color: var(--neon-green, #00ffc3); margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-history"></i> سجل معاملات الدفع بالرصيد الخاصة بمتجري
+              </h3>
+              <div class="table-wrapper" style="overflow-x:auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: right;">
+                  <thead>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                      <th style="padding: 10px; color: #aaa;">رقم المعاملة</th>
+                      <th style="padding: 10px; color: #aaa;">رقم الهاتف</th>
+                      <th style="padding: 10px; color: #aaa;">الشبكة</th>
+                      <th style="padding: 10px; color: #aaa;">المبلغ (دج)</th>
+                      <th style="padding: 10px; color: #aaa;">رسوم المنصة (دج)</th>
+                      <th style="padding: 10px; color: #aaa;">رسوم الشبكة (دج)</th>
+                      <th style="padding: 10px; color: #aaa;">الصافي (دج)</th>
+                      <th style="padding: 10px; color: #aaa;">الحالة</th>
+                      <th style="padding: 10px; color: #aaa;">التاريخ</th>
+                    </tr>
+                  </thead>
+                  <tbody id="vendorDcbTransactionsTable">
+                    <tr>
+                      <td colspan="9" style="text-align: center; padding: 20px; color: #888;">جاري تحميل المعاملات...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- ================= قسم صفقات الموردين B2B ================= -->
+        <div id="supplierDealsSection" class="dashboard-tab-section" style="display:none;">
+          <section class="dashboard-box">
+            <h2><i class="fas fa-handshake"></i> صفقات الموردين والاستيراد (B2B)</h2>
+            <p style="color:#aaa; margin-bottom:20px;">تصفح المنتجات المتوفرة بالجملة من المستوردين والمصنعين مباشرة بأسعار تفضيلية حسب الكمية.</p>
+            
+            <div id="supplierDealsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+              <!-- B2B Supplier products load here -->
+            </div>
+            <div id="noSupplierDealsMsg" style="text-align:center; padding:30px; color:#aaa; display:none;">
+              لا توجد صفقات متاحة حالياً.
+            </div>
+          </section>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- نافذة طلب شراء بالجملة B2B -->
+  <div id="b2bOrderModal" class="modal" style="display:none; align-items:center; justify-content:center; z-index: 1000;">
+    <div class="modal-content" style="max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; text-align: right;">
+      <button class="close-modal" onclick="closeB2bOrderModal()">×</button>
+      <h3 style="color: #00ffc3; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;"><i class="fas fa-handshake"></i> طلب شراء بالجملة B2B</h3>
+      
+      <div id="b2bModalProductInfo" style="display: flex; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px; text-align: right;">
+        <img id="b2bModalProductImg" src="" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+        <div style="flex: 1;">
+          <h4 id="b2bModalProductName" style="margin: 0 0 5px; font-size: 16px;"></h4>
+          <p id="b2bModalProductSupplier" style="margin: 0 0 5px; font-size: 13px; color: #aaa;"></p>
+          <span id="b2bModalProductPrice" style="font-size: 14px; font-weight: bold; color: #00ffc3;"></span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+        <div>
+          <label style="display: block; font-size: 12px; color: #aaa; margin-bottom: 4px;">الكمية المطلوبة (الحد الأدنى: <span id="b2bModalProductMOQ">10</span>)</label>
+          <input type="number" id="b2bOrderQty" min="1" step="1" oninput="calculateB2bOrder()" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: #fff; font-family: inherit;">
+        </div>
+        <div>
+          <label style="display: block; font-size: 12px; color: #aaa; margin-bottom: 4px;">سعر القطعة الحالي</label>
+          <div id="b2bOrderCurrentPrice" style="font-size: 16px; font-weight: bold; color: #fff; padding: 10px 0;">--</div>
+        </div>
+      </div>
+
+      <!-- فئات الخصومات للمنتج الحالي -->
+      <div id="b2bModalTiersContainer" style="margin-bottom: 20px; padding: 10px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+        <h5 style="margin: 0 0 8px; font-size: 12px; color: #aaa;">🎁 جدول خصم الكميات:</h5>
+        <div id="b2bModalTiersList" style="font-size: 13px; color: #eee; display: flex; flex-direction: column; gap: 4px;"></div>
+      </div>
+
+      <!-- حساب التكلفة والعمولة -->
+      <div style="margin-bottom: 20px; padding: 12px; background: rgba(0,255,195,0.05); border: 1px solid rgba(0,255,195,0.15); border-radius: 8px; font-size: 14px; line-height: 1.6;">
+        <div style="display: flex; justify-content: space-between;"><span>إجمالي الفاتورة:</span> <strong id="b2bOrderTotalVal">0 دج</strong></div>
+        <div style="display: flex; justify-content: space-between; color: #00ffc3;"><span>العربون المستحق للدفع (20%):</span> <strong id="b2bOrderDepositVal">0 دج</strong></div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #aaa; margin-top: 4px;"><span>المتبقي للدفع للمورد (80%):</span> <span id="b2bOrderRemainingVal">0 دج</span></div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #aaa; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 4px; margin-top: 4px;"><span>عمولة المنصة الآلية (5%):</span> <span id="b2bOrderCommissionVal">0 دج</span></div>
+      </div>
+
+      <!-- معلومات الشحن والتسليم للمشتري -->
+      <h4 style="margin: 0 0 10px; font-size: 14px; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px;"><i class="fas fa-truck"></i> معلومات الشحن والتسليم</h4>
+      <div class="form-group" style="margin-bottom: 12px;">
+        <input type="text" id="b2bBuyerName" placeholder="الاسم الكامل للمستلم" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: #fff; font-family: inherit;">
+      </div>
+      <div class="form-group" style="margin-bottom: 12px;">
+        <input type="tel" id="b2bBuyerPhone" placeholder="رقم الهاتف" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: #fff; font-family: inherit;">
+      </div>
+      <div class="form-group" style="margin-bottom: 12px;">
+        <input type="text" id="b2bBuyerAddress" placeholder="عنوان التوصيل الكامل (الولاية والبلدية والحي)" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: #fff; font-family: inherit;">
+      </div>
+      
+      <button onclick="submitB2bOrder()" class="save-btn" id="b2bSubmitBtn" style="width: 100%; margin-top: 15px;"><i class="fas fa-check-circle"></i> تأكيد الطلب ودفع العربون</button>
+    </div>
+  </div>
+
+  <!-- نافذة الفاتورة B2B -->
+  <div id="b2bInvoiceModal" class="modal" style="display:none; align-items:center; justify-content:center; z-index: 1000;">
+    <div class="modal-content" style="max-width: 700px; width: 95%; max-height: 90vh; overflow-y: auto; background: #fff; color: #000; padding: 30px; border-radius: 12px;">
+      <button class="close-modal" onclick="closeInvoiceModal()" style="color: #000; font-size: 28px;">×</button>
+      
+      <!-- منطقة الطباعة النظيفة -->
+      <div id="invoicePrintArea" style="text-align: right; font-family: sans-serif; direction: rtl;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 20px; align-items: center;">
+          <div>
+            <h1 style="margin: 0; font-size: 22px; color: #111;">فاتورة بيع بالجملة</h1>
+            <p style="margin: 5px 0 0; color: #666; font-size: 12px;">فاتورة رسمية صادرة من منصة "كلش هنا B2B"</p>
+          </div>
+          <div style="text-align: left; direction: ltr;">
+            <h2 style="margin: 0 0 5px; font-size: 18px; color: #111;">KOLSHI HNA B2B</h2>
+            <p style="margin: 0; font-size: 13px; color: #333;">Ref: <strong id="invNumber">--</strong></p>
+            <p style="margin: 3px 0 0; font-size: 12px; color: #666;">Date: <span id="invDate">--</span></p>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; font-size: 13px;">
+          <div style="background: #f9f9f9; padding: 12px; border-radius: 6px; border: 1px solid #eee; text-align: right;">
+            <strong style="display: block; font-size: 13px; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 4px; color: #111;">المورد (البائع):</strong>
+            <p style="margin: 3px 0;" id="invSupplierCompany">الشركة: --</p>
+            <p style="margin: 3px 0;" id="invSupplierPhone">الهاتف: --</p>
+            <p style="margin: 3px 0;" id="invSupplierEmail">البريد: --</p>
+          </div>
+          <div style="background: #f9f9f9; padding: 12px; border-radius: 6px; border: 1px solid #eee; text-align: right;">
+            <strong style="display: block; font-size: 13px; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 4px; color: #111;">المشتري (التاجر المستلم):</strong>
+            <p style="margin: 3px 0;" id="invBuyerName">الاسم: --</p>
+            <p style="margin: 3px 0;" id="invBuyerPhone">الهاتف: --</p>
+            <p style="margin: 3px 0;" id="invBuyerAddress">العنوان: --</p>
+          </div>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; text-align: right;">
+          <thead>
+            <tr style="background: #f4f4f4; border-bottom: 2px solid #ddd;">
+              <th style="padding: 10px; border: 1px solid #ddd; text-align: right;">المنتج</th>
+              <th style="padding: 10px; border: 1px solid #ddd; width: 80px; text-align: center;">الكمية</th>
+              <th style="padding: 10px; border: 1px solid #ddd; width: 120px; text-align: left;">سعر الوحدة</th>
+              <th style="padding: 10px; border: 1px solid #ddd; width: 140px; text-align: left;">المجموع الفرعي</th>
+            </tr>
+          </thead>
+          <tbody id="invItemsBody">
+            <!-- items generated dynamically -->
+          </tbody>
+        </table>
+
+        <div style="display: flex; justify-content: flex-end; font-size: 13px; line-height: 1.8;">
+          <div style="width: 280px; background: #f9f9f9; padding: 12px; border-radius: 6px; border: 1px solid #eee; text-align: right;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;"><span>المجموع الإجمالي:</span> <strong id="invTotalAmount">0 دج</strong></div>
+            <div style="display: flex; justify-content: space-between; color: #2e7d32; font-weight: bold; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 5px;"><span>العربون المدفوع (20%):</span> <span id="invDepositPaid">0 دج</span></div>
+            <div style="display: flex; justify-content: space-between; font-weight: bold;"><span>المتبقي للدفع للمورد (80%):</span> <span id="invRemainingDue" style="color: #c62828;">0 دج</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- أزرار الإجراءات -->
+      <div style="display: flex; gap: 10px; margin-top: 30px; justify-content: flex-end;" class="no-print">
+        <button onclick="printB2bInvoice()" class="save-btn" style="background: #1976d2; color: #fff; padding: 8px 16px; border-radius: 8px; font-family: inherit; font-size: 13px; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px;"><i class="fas fa-print"></i> طباعة الفاتورة</button>
+        <button onclick="sendInvoiceWhatsApp()" class="save-btn" style="background: #25d366; color: #fff; padding: 8px 16px; border-radius: 8px; font-family: inherit; font-size: 13px; border: none; cursor: pointer; display: flex; align-items: center; gap: 5px;"><i class="fab fa-whatsapp"></i> إرسال عبر الواتساب</button>
+        <button onclick="closeInvoiceModal()" class="save-btn" style="background: #757575; color: #fff; padding: 8px 16px; border-radius: 8px; font-family: inherit; font-size: 13px; border: none; cursor: pointer;">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- نافذة إعدادات الملف الشخصي -->
+  <div id="profileModal" class="modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="toggleProfile()">×</button>
+      <h3 data-key="settings_title"><i class="fas fa-store-alt"></i> إعدادات المتجر</h3>
+      
+      <!-- لوغو المتجر -->
+      <div class="form-group store-logo-upload">
+        <label><i class="fas fa-camera"></i> لوغو المتجر</label>
+        <div class="logo-preview-wrapper">
+          <img id="storeLogoPreview" 
+             src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Crect width='80' height='80' fill='%232a2a2a' rx='40'/%3E%3Ctext x='40' y='48' text-anchor='middle' font-size='32' fill='%2300ffc3'%3E🏪%3C/text%3E%3C/svg%3E" 
+             alt="لوغو المتجر" class="logo-preview-img">
+          <label for="storeLogoInput" class="logo-upload-label">
+            <i class="fas fa-upload"></i> تغيير الصورة
+          </label>
+          <input type="file" id="storeLogoInput" accept="image/*" style="display:none;" onchange="previewStoreLogo(this)">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label data-key="store_name_label"><i class="fas fa-signature"></i> اسم المتجر</label>
+        <input type="text" id="merchantNameInput" placeholder="أدخل اسم متجرك">
+      </div>
+      
+      <div class="form-group">
+        <label><i class="fas fa-tags"></i> تصنيف المتجر</label>
+        <select id="merchantClassificationInput">
+          <option value="retail">تجزئة (Retail)</option>
+          <option value="wholesale">جملة (Wholesale)</option>
+        </select>
+      </div>
+      
+      <!-- إعدادات التوصيل (Yalidine & Z-Express) -->
+      <div id="yalidineSettings" style="display:none; margin-top:20px; margin-bottom:15px; padding:15px; border:1px solid rgba(0,255,195,0.2); border-radius:10px;">
+        <h4 style="margin-bottom:15px; color:#00ffc3;"><i class="fas fa-truck"></i> ربط التوصيل (Yalidine / Z-Express)</h4>
+        
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label>Yalidine API ID</label>
+          <input type="text" id="merchantYalidineId" placeholder="أدخل Yalidine API ID">
+        </div>
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label>Yalidine API Token</label>
+          <input type="password" id="merchantYalidineToken" placeholder="أدخل Yalidine API Token">
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label>Z-Express API Token</label>
+          <input type="password" id="merchantZExpressToken" placeholder="أدخل Z-Express API Token">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label data-key="store_bio_label"><i class="fas fa-info-circle"></i> وصف المتجر</label>
+        <textarea id="merchantBioInput" placeholder="أدخل وصفاً لمتجرك" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-phone"></i> رقم الهاتف</label>
+        <input type="text" id="merchantPhoneInput" placeholder="مثال: 0555 123 456">
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-map-marker-alt"></i> العنوان</label>
+        <input type="text" id="merchantAddressInput" placeholder="المدينة، الحي">
+      </div>
+
+
+
+      <!-- رفع إعلان VIP -->
+      <div id="vipAdSettings" style="display:none; margin-top:20px; margin-bottom:15px; padding:15px; border:1px solid rgba(189,0,255,0.2); border-radius:10px;">
+        <h4 style="margin-bottom:15px; color:#bd00ff;"><i class="fas fa-ad"></i> إعلان الشريط الرئيسي (VIP)</h4>
+        <div class="form-group">
+          <label>عنوان الإعلان</label>
+          <input type="text" id="vipAdTitleInput" placeholder="مثال: تخفيضات كبرى">
+        </div>
+        <div class="form-group">
+          <label>صورة الإعلان</label>
+          <input type="file" id="vipAdImageInput" accept="image/*">
+        </div>
+        <small style="color:#aaa;">هذا الإعلان سيظهر في الشريط الرئيسي المتحرك للموقع.</small>
+      </div>
+
+      <!-- روابط التواصل الاجتماعي -->
+      <p class="social-section-title"><i class="fas fa-share-alt"></i> روابط التواصل الاجتماعي (اختياري)</p>
+
+      <div class="social-input-row">
+        <span class="social-icon ig"><i class="fab fa-instagram"></i></span>
+        <input type="url" id="merchantInstagram" placeholder="https://instagram.com/متجرك">
+      </div>
+      <div class="social-input-row">
+        <span class="social-icon fb"><i class="fab fa-facebook-f"></i></span>
+        <input type="url" id="merchantFacebook" placeholder="https://facebook.com/متجرك">
+      </div>
+      <div class="social-input-row">
+        <span class="social-icon tk"><i class="fab fa-tiktok"></i></span>
+        <input type="url" id="merchantTiktok" placeholder="https://tiktok.com/@متجرك">
+      </div>
+      <div class="social-input-row">
+        <span class="social-icon wa"><i class="fab fa-whatsapp"></i></span>
+        <input type="tel" id="merchantWhatsapp" placeholder="213XXXXXXXXX">
+      </div>
+      <div class="social-input-row">
+        <span class="social-icon web"><i class="fas fa-globe"></i></span>
+        <input type="url" id="merchantWebsite" placeholder="https://موقعك.com">
+      </div>
+
+      <button class="save-btn" onclick="saveProfile()" data-key="save_changes">
+        <i class="fas fa-save"></i> حفظ التعديلات
+      </button>
+    </div>
+  </div>
+
+  <!-- نافذة إضافة منتج جديد -->
+  <div id="addForm" class="modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="hideAddProductForm()">×</button>
+      <h3 data-key="new_product"><i class="fas fa-cube"></i> منتج جديد</h3>
+      <div class="form-group">
+        <label data-key="p_name_ph"><i class="fas fa-tag"></i> اسم المنتج</label>
+        <input type="text" id="productName" placeholder="أدخل اسم المنتج">
+      </div>
+      <div class="form-group">
+        <label data-key="p_price_ph"><i class="fas fa-money-bill"></i> السعر (دج)</label>
+        <input type="number" id="productPrice" placeholder="أدخل السعر" min="0" step="0.01">
+      </div>
+      
+      <!-- حقول الجملة للتاجر الجملة فقط -->
+      <div class="form-group" id="wholesaleFields" style="display: none; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+        <div>
+          <label><i class="fas fa-handshake"></i> سعر الجملة (دج)</label>
+          <input type="number" id="productWholesalePrice" placeholder="سعر الجملة" min="0" step="0.01">
+        </div>
+        <div>
+          <label><i class="fas fa-tags"></i> أدنى سعر للتجزئة (دج)</label>
+          <input type="number" id="productMinRetailPrice" placeholder="أدنى سعر للتجزئة" min="0" step="0.01">
+        </div>
+        <div>
+          <label><i class="fas fa-boxes"></i> أقل كمية للطلب (جملة)</label>
+          <input type="number" id="productMinOrderQty" placeholder="أقل كمية" min="1" step="1" value="10">
+        </div>
+      </div>
+
+      <!-- تصنيف المنتج في سوق الجملة B2B - للتاجر الجملة فقط -->
+      <div class="form-group" id="b2bCategoryField" style="display: none;">
+        <label><i class="fas fa-th-large" style="color:#00c896;"></i> تصنيف المنتج في سوق الجملة B2B</label>
+        <select id="productB2bCategory" style="width:100%; padding:10px; border-radius:8px; border:1px solid rgba(0,200,150,0.3); background:rgba(0,200,150,0.05); color:inherit; font-family:inherit; font-size:14px; cursor:pointer;">
+          <option value="">-- اختر التصنيف --</option>
+          <option value="electronics">📱 إلكترونيات</option>
+          <option value="clothing">👗 ملابس وموضة</option>
+          <option value="home">🛋️ منزل وأثاث</option>
+          <option value="cosmetics">💄 تجميل وعناية</option>
+          <option value="food">🌾 غذاء وزراعة</option>
+          <option value="other">📦 أخرى</option>
+        </select>
+      </div>
+
+      <div id="volumeDiscountsContainer" style="display: none; margin-bottom: 15px; padding: 12px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;">
+        <label style="font-weight: bold; display: block; margin-bottom: 8px; font-size: 13px; color: #00ffc3;"><i class="fas fa-percentage"></i> فئات خصم الكميات (جملة)</label>
+        <div id="volumeDiscountTiersList" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;"></div>
+        <button type="button" onclick="addVolumeDiscountTier()" style="padding: 6px 12px; font-size: 12px; background: rgba(0,200,150,0.1); color: #00c896; border: 1px solid rgba(0,200,150,0.2); border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; width: fit-content; font-family: inherit;">
+          <i class="fas fa-plus"></i> إضافة فئة خصم جديدة
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label><i class="fas fa-align-left"></i> وصف المنتج</label>
+        <textarea id="productDesc" placeholder="أدخل وصف المنتج" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-list"></i> تفاصيل المنتج (اختياري، افصل بين الخيارات بفاصلة)</label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <input type="text" id="productType" placeholder="النوع (مثال: قطن, حرير)">
+          <input type="text" id="productColor" placeholder="اللون (مثال: أحمر, أزرق)">
+          <input type="text" id="productSize" placeholder="المقاس (مثال: S, M, L)">
+          <input type="text" id="productDimensions" placeholder="الأبعاد (مثال: 10x20cm)">
+        </div>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-image"></i> صور المنتج (حتى 8 صور)</label>
+        <input type="file" id="productImageInput" accept="image/*" class="file-input" multiple>
+        <div id="imagePreviewContainer" style="display:flex; gap:10px; overflow-x:auto; margin-top:10px;"></div>
+        <small style="color: #aaa; font-size: 12px; display: block; margin-top: 5px;">
+          الصور الموصى بها: JPG, PNG, حجم أقل من 5MB لكل صورة
+        </small>
+      </div>
+      <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+        <input type="checkbox" id="productIsPublished" checked style="width: 20px; height: 20px; cursor: pointer; margin: 0;">
+        <label for="productIsPublished" style="margin-bottom: 0; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+          <i class="fas fa-eye"></i> نشر المنتج مباشرة في المتجر
+        </label>
+      </div>
+      <button class="save-btn" id="submitProductBtn" onclick="addProduct()" data-key="publish_btn">
+        <i class="fas fa-rocket"></i> نشر المنتج
+      </button>
+    </div>
+  </div>
+
+  <!-- نافذة ترقية الباقة - تصميم مطابق لصفحة الباقات -->
+  <div id="upgradePlanModal" class="modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="document.getElementById('upgradePlanModal').style.display='none'">&times;</button>
+      <h3><i class="fa-solid fa-rocket"></i> طوّر باقتك</h3>
+      <p style="color:#aaa; font-size:13px; text-align:center; margin:0 0 4px">سيتم إرسال طلبك للإدارة وسيتواصلون معك لإتمام الدفع والتفعيل</p>
+
+      <!-- Toggle شهري / سنوي -->
+      <div class="upgrade-billing-toggle">
+        <span>شهري</span>
+        <label class="switch">
+          <input type="checkbox" id="upgradeBillingCycle" onchange="updateUpgradePrices()">
+          <span class="slider"></span>
+        </label>
+        <span>سنوي <small style="color:#00ffc3; font-weight:bold">(خصم 20%)</small></span>
+      </div>
+
+      <!-- رسالة المشتركين في باقة VIP بالفعل -->
+      <div id="vipAlreadyMessage" style="display:none; text-align:center; padding:30px 20px; color:#aaa;">
+        <div style="font-size:48px; margin-bottom:15px;">👑</div>
+        <h3 data-key="already_vip_title">أنت مشترك بالفعل في الباقة القصوى (VIP)</h3>
+        <p data-key="already_vip_desc" style="font-size:13px; margin-top:10px; color:#888;">شكرًا لثقتك بنا! متجرك يستمتع بجميع الميزات غير المحدودة.</p>
+      </div>
+
+      <!-- بطاقات الباقات -->
+      <div class="upgrade-plans-grid" id="upgradeOptionsGrid">
+
+        <div class="up-plan-card" data-plan="gold" data-monthly="3000" data-yearly="36000" onclick="selectUpgradePlan(this)">
+          <span class="up-badge">شائعة</span>
+          <div class="up-plan-name"><i class="fa-solid fa-medal"></i> الذهبية</div>
+          <div class="up-plan-price"><span id="up-price-gold">3000</span><span>دج/شهر</span></div>
+          <ul class="up-plan-features">
+            <li>20 منتج</li>
+            <li>إحصائيات عدد الزوار</li>
+            <li>أولوية عند البحث</li>
+            <li>دعم عبر البريد</li>
+          </ul>
+          <button class="up-select-btn" onclick="event.stopPropagation(); selectUpgradePlan(this.closest('.up-plan-card'))">اختيار الذهبية</button>
+        </div>
+
+        <div class="up-plan-card" data-plan="premium" data-monthly="8500" data-yearly="102000" onclick="selectUpgradePlan(this)">
+          <div class="up-plan-name"><i class="fa-solid fa-gem"></i> بريميوم</div>
+          <div class="up-plan-price"><span id="up-price-premium">8500</span><span>دج/شهر</span></div>
+          <ul class="up-plan-features">
+            <li>50 منتج</li>
+            <li>إحصاء المبيعات</li>
+            <li>ظهور في الواجهة الرئيسية</li>
+            <li>أولوية الدعم الفني</li>
+          </ul>
+          <button class="up-select-btn" onclick="event.stopPropagation(); selectUpgradePlan(this.closest('.up-plan-card'))">اختيار بريميوم</button>
+        </div>
+
+        <div class="up-plan-card" data-plan="vip" data-monthly="14000" data-yearly="168000" onclick="selectUpgradePlan(this)">
+          <span class="up-badge" style="background:#bd00ff;color:white">الأفضل</span>
+          <div class="up-plan-name"><i class="fa-solid fa-crown"></i> VIP</div>
+          <div class="up-plan-price"><span id="up-price-vip">14000</span><span>دج/شهر</span></div>
+          <ul class="up-plan-features">
+            <li>منتجات غير محدودة</li>
+            <li>إحصاء شامل للمتجر</li>
+            <li>واجهة خاصة للمتجر</li>
+            <li>إعلانات في الواجهة</li>
+            <li>أولوية الدعم الفني</li>
+            <li>إعلانات ممولة في مواقع التواصل (3/شهرياً)</li>
+          </ul>
+          <button class="up-select-btn" onclick="event.stopPropagation(); selectUpgradePlan(this.closest('.up-plan-card'))">اختيار VIP</button>
+        </div>
+
+      </div><!-- end upgrade-plans-grid -->
+
+      <button class="upgrade-send-btn" id="upgradeSendBtn" onclick="submitUpgradeRequest()" disabled data-key="upgrade_send_btn">
+        إرسال طلب الترقية
+      </button>
+
+    </div><!-- end modal-content -->
+  </div><!-- end upgradePlanModal -->
+
+  <script src="js/dashboard-translations.js"></script>
+  <script src="js/dcb-engine.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/dark-mode.js" defer></script>
+  <script src="js/ia-agent.js"></script>
+  <script src="js/reviews.js" defer></script>
+  <script src="js/onboarding.js"></script>
+
+
+  <script>
+    // تمييز زر اللغة النشط
+    (function() {
+      const lang = localStorage.getItem('lang') || 'ar';
+      const map = { ar: 'langBtnAr', fr: 'langBtnFr', en: 'langBtnEn' };
+      const btn = document.getElementById(map[lang]);
+      if (btn) btn.classList.add('active');
+    })();
+
+    // إغلاق النوافذ عند الضغط على زر ESC
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal').forEach(m => { if (m.style.display === 'flex') m.style.display = 'none'; });
+        const menu = document.getElementById('menuItems');
+        if (menu) menu.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html>

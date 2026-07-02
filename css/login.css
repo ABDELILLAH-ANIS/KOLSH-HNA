@@ -1,0 +1,418 @@
+/* ============ RESET & BASE ============ */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --neon: #00ffc3;
+  --neon-glow: rgba(0, 255, 195, 0.35);
+  --bg-dark: #0d0d0d;
+  --bg-card: rgba(22, 22, 30, 0.92);
+  --text-primary: #f0f0f0;
+  --text-muted: #8a8a9a;
+  --border: rgba(255, 255, 255, 0.08);
+  --input-bg: rgba(255, 255, 255, 0.04);
+  --danger: #ff5c7a;
+  --success: #4cce8a;
+}
+
+body {
+  font-family: 'Gumela', 'Segoe UI', sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* -------- خلفية متحركة -------- */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 30%, rgba(0, 255, 195, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 70%, rgba(100, 60, 255, 0.06) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ============ CARD ============ */
+.auth-box {
+  background: var(--bg-card);
+  padding: 44px 36px;
+  border-radius: 24px;
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 0 40px rgba(0, 255, 195, 0.04);
+  width: 100%;
+  max-width: 440px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  animation: cardIn 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(22px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+/* -------- شعار / اسم المتجر -------- */
+.welcome {
+  font-size: 13px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--neon);
+  margin-bottom: 6px;
+  opacity: 0.85;
+  animation: glow 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 6px var(--neon-glow); }
+  to   { text-shadow: 0 0 14px var(--neon-glow), 0 0 28px rgba(0,255,195,0.15); }
+}
+
+.auth-box h2 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 28px;
+  letter-spacing: 0.3px;
+}
+
+/* ============ FORM ============ */
+.form-group {
+  margin-bottom: 18px;
+  text-align: right;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 13px;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 13px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+}
+
+.form-group input::placeholder { color: rgba(255,255,255,0.2); }
+
+.form-group input:focus {
+  border-color: var(--neon);
+  background: rgba(0,255,195,0.03);
+  box-shadow: 0 0 0 3px rgba(0,255,195,0.12);
+}
+
+/* ============ BUTTONS ============ */
+button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.07);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.25s, transform 0.2s, box-shadow 0.25s;
+  margin-bottom: 12px;
+}
+
+button:hover:not(:disabled) {
+  background: rgba(255,255,255,0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+}
+
+button:active:not(:disabled) { transform: translateY(0); }
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* --- زر الدخول الرئيسي --- */
+#loginBtn {
+  background: linear-gradient(135deg, var(--neon) 0%, #00c99a 100%);
+  color: #0a0a0a;
+  font-weight: 700;
+  font-size: 16px;
+  box-shadow: 0 4px 20px rgba(0,255,195,0.3);
+  margin-bottom: 16px;
+}
+
+#loginBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1fffcd 0%, #00e0a8 100%);
+  box-shadow: 0 6px 28px rgba(0,255,195,0.45);
+}
+
+/* --- فاصل "أو" --- */
+.or-divider {
+  display: flex;
+  align-items: center;
+  margin: 16px 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.or-divider::before,
+.or-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  margin: 0 12px;
+}
+
+/* --- زر Google --- */
+.google-login-btn {
+  background: #fff;
+  color: #2d2d2d;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px;
+  margin-bottom: 18px;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+.google-login-btn:hover {
+  background: #f5f5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+  color: #2d2d2d;
+}
+
+.google-login-btn img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+/* --- أزرار الإجراءات --- */
+.action-links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.action-links button { margin-bottom: 0; }
+
+#createAccountBtn {
+  background: rgba(0,255,195,0.1);
+  color: var(--neon);
+  border: 1px solid rgba(0,255,195,0.25);
+  font-weight: 600;
+}
+
+#createAccountBtn:hover:not(:disabled) {
+  background: rgba(0,255,195,0.18);
+  border-color: rgba(0,255,195,0.4);
+  color: var(--neon);
+  box-shadow: 0 0 16px rgba(0,255,195,0.15);
+}
+
+#forgotPasswordBtn {
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 14px;
+  border: 1px solid var(--border);
+}
+
+#forgotPasswordBtn:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.18);
+}
+
+/* --- زر الرجوع --- */
+#backButton,
+#backToLoginBtn {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+#backButton:hover,
+#backToLoginBtn:hover {
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.2);
+}
+
+/* --- زر إرسال الاسترجاع --- */
+#sendResetBtn {
+  background: linear-gradient(135deg, #6a5acd 0%, #5547b8 100%);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(106,90,205,0.3);
+}
+
+#sendResetBtn:hover:not(:disabled) {
+  box-shadow: 0 6px 22px rgba(106,90,205,0.45);
+}
+
+/* ============ MESSAGES ============ */
+.error-message {
+  color: var(--danger);
+  font-size: 13.5px;
+  margin: 12px 0;
+  padding: 11px 14px;
+  background: rgba(255, 92, 122, 0.08);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 92, 122, 0.2);
+  display: none;
+  text-align: right;
+  animation: slideIn 0.3s ease;
+}
+
+.success-message {
+  color: var(--success);
+  font-size: 13.5px;
+  margin: 12px 0;
+  padding: 11px 14px;
+  background: rgba(76, 206, 138, 0.08);
+  border-radius: 10px;
+  border: 1px solid rgba(76, 206, 138, 0.2);
+  display: none;
+  text-align: right;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============ LANGUAGE SWITCHER ============ */
+.language {
+  position: fixed;
+  top: 22px;
+  left: 22px;
+  z-index: 1000;
+}
+
+.language > button {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 20px;
+  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.language > button:hover {
+  background: rgba(255,255,255,0.12);
+  transform: none;
+  box-shadow: none;
+}
+
+.lang-menu {
+  display: none;
+  list-style: none;
+  background: rgba(18,18,24,0.97);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  position: absolute;
+  top: 50px;
+  left: 0;
+  min-width: 140px;
+  padding: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  backdrop-filter: blur(16px);
+}
+
+.lang-menu.show {
+  display: block;
+  animation: fadeIn 0.2s ease;
+}
+
+.lang-menu li {
+  padding: 9px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  transition: background 0.2s, color 0.2s;
+}
+
+.lang-menu li:hover {
+  background: rgba(0,255,195,0.07);
+  color: var(--neon);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 480px) {
+  .auth-box {
+    padding: 32px 22px;
+  }
+
+  .auth-box h2 { font-size: 22px; }
+
+  .language {
+    top: 14px;
+    left: 14px;
+  }
+}
+
+/* ── Select and Option Global Overrides ───────────────────────── */
+select, 
+select option, 
+select option:checked, 
+select option:hover, 
+select:focus,
+select:active,
+select.form-control,
+.form-group select,
+.toolbar select {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}

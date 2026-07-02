@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n="page_title">متجر - كلش هنا</title>
+  
+  <!-- الخطوط والأيقونات -->
+  <link href="https://fonts.googleapis.com/css2?family=Gumela&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/store.css">
+  <link rel="stylesheet" href="css/cart.css">
+  
+  <!-- Supabase & Config -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+</head>
+<body>
+
+  <!-- شريط التنقل العلوي -->
+  <div class="back-nav">
+    <a href="index.html" class="back-btn" id="backBtn">
+      <i class="fas fa-arrow-right"></i> <span data-i18n="back_home">الرئيسية</span>
+    </a>
+    <!-- زر تبديل اللغة -->
+    <button class="lang-switch-btn" id="langSwitchBtn" onclick="cycleLang()">
+      <i class="fa-solid fa-globe"></i> <span id="currentLangLabel">AR</span>
+    </button>
+  </div>
+
+  <!-- الهيدر الأسود العلوي للمتجر -->
+  <header class="store-top-header" id="storeHeader" style="display: none;">
+    <div class="header-right-side">
+      <img src="images/placeholder.png" alt="شعار المتجر" class="store-logo" id="storeLogo">
+    </div>
+    <div class="header-center-side">
+      <h1 class="store-name" id="storeName" data-i18n="loading">جاري التحميل...</h1>
+    </div>
+    <div class="header-left-side">
+      <div class="action-pills">
+        <button class="pill-action" onclick="Cart.show()" data-i18n="cart"><i class="fas fa-shopping-cart"></i> السلة</button>
+        <button class="pill-action" id="rateStoreBtn" onclick="KHReviews && window._storeEmail && KHReviews.openModal(window._storeEmail, window._storeName)"><i class="fas fa-star"></i> تقييم المتجر</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- معلومات المتجر وتواصله -->
+  <div class="store-bio-contact" id="storeBioContact" style="display: none;">
+    <p class="store-bio" id="storeBio"></p>
+    <div class="contact-info" id="contactInfo">
+      <!-- بيانات التواصل تضاف ديناميكياً -->
+    </div>
+  </div>
+
+  <!-- حالة التحميل -->
+  <div id="loadingState" class="loading-spinner">
+    <div class="spinner"></div>
+    <p data-i18n="loading_store">جاري تحميل المتجر...</p>
+  </div>
+
+  <!-- المنتجات -->
+  <main class="store-container" id="mainContainer" style="display: none;">
+    <h2 class="section-title" data-i18n="latest_products">أحدث المنتجات</h2>
+    <div class="products-grid" id="productsGrid">
+      <!-- المنتجات تضاف ديناميكياً -->
+    </div>
+    <!-- قسم التقييمات -->
+    <div id="storeReviewsContainer" style="margin-top:20px;"></div>
+  </main>
+
+  <!-- شريط الإعلانات السفلي العريض (VIP) -->
+  <section class="store-vip-ads-bottom">
+    <h3>VIP</h3>
+    <div id="storeVipGallery" class="expanding-gallery">
+      <!-- ستُملأ ديناميكياً في حالة إضافة السكربت أو تترك فارغة الآن -->
+    </div>
+  </section>
+
+  <footer>
+    <p><span data-i18n="footer_rights">جميع الحقوق محفوظة © كلش هنا</span> <span id="currentYear"></span></p>
+  </footer>
+
+  <!-- يتم حقن زر السلة العائم تلقائياً بواسطة cart.js لضمان عمله وتحديثه بشكل صحيح -->
+
+  <!-- نافذة تفاصيل المنتج -->
+  <div id="productModal" class="modal" style="display: none;">
+    <div class="modal-content product-modal-content">
+      <button class="close-modal" onclick="closeProductModal()">×</button>
+      
+      <!-- معرض الصور -->
+      <div class="product-gallery">
+        <div class="main-image-container">
+          <img id="modalMainImage" src="images/placeholder.png" alt="المنتج">
+        </div>
+        <div class="thumbnails" id="modalThumbnails">
+          <!-- صور مصغرة -->
+        </div>
+      </div>
+      
+      <div class="product-details">
+        <h2 id="modalProductName">اسم المنتج</h2>
+        <p class="price" id="modalProductPrice">0 دج</p>
+        <p class="description" id="modalProductDesc"></p>
+        
+        <!-- تفاصيل المنتج (متغيرات) -->
+        <div class="product-variants" id="modalVariants">
+          <!-- تُضاف ديناميكياً -->
+        </div>
+        
+        <button class="add-to-cart-btn large" id="modalAddToCartBtn">
+          <span data-i18n="add_to_cart">إضافة للسلة</span> <i class="fas fa-cart-plus"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/store_translations.js"></script>
+  <script src="js/dcb-engine.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/dark-mode.js"></script>
+  <script src="js/reviews.js"></script>
+  <script>
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

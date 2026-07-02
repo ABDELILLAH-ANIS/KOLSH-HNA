@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>طلب جملة — كلش هنا B2B</title>
+<meta name="description" content="إتمام طلب جملة معتمد — دفع عربون 20% من المنصة وتواصل مباشر مع التاجر."/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="css/wholesale.css"/>
+
+<style>
+/* ═══════════════════════════════════
+   ORDER PAGE — SPECIFIC STYLES
+═══════════════════════════════════ */
+body { background: var(--bg); min-height: 100vh; }
+
+/* Top bar */
+.order-topbar {
+    background: var(--surface);
+    border-bottom: 1.5px solid var(--border);
+    padding: 0 24px;
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border);
+    background: var(--surface-2);
+    transition: border-color .2s, color .2s;
+}
+.back-link:hover { border-color: var(--brand); color: var(--brand); }
+
+/* Layout */
+.order-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+    align-items: start;
+}
+@media (max-width: 768px) {
+    .order-page { grid-template-columns: 1fr; }
+}
+
+/* Product info card */
+.prod-info-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+}
+.prod-img-big {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    display: block;
+    background: var(--surface-2);
+}
+.prod-info-body { padding: 20px 22px; }
+.prod-title { font-size: 20px; font-weight: 900; margin-bottom: 6px; }
+.prod-merchant-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+}
+.verified-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(0,200,150,.1);
+    color: var(--brand);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(0,200,150,.25);
+}
+
+/* Price tiers */
+.tier-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    font-size: 13px;
+}
+.tier-table th {
+    background: var(--surface-2);
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-align: right;
+    letter-spacing: 0.03em;
+}
+.tier-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+}
+.tier-table tr:last-child td { border-bottom: none; }
+.tier-best { color: var(--brand); font-weight: 900; font-size: 15px; }
+.tier-good { color: #f59e0b; font-weight: 700; }
+
+.prod-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+}
+
+/* Steps */
+.steps-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 24px;
+    position: relative;
+}
+.step-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    position: relative;
+    z-index: 1;
+}
+.step-dot {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 900;
+    border: 2px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-muted);
+    transition: all .3s;
+}
+.step-dot.active {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #053023;
+    box-shadow: 0 0 0 4px rgba(0,200,150,.15);
+}
+.step-dot.done { background: var(--brand); border-color: var(--brand); color: #053023; }
+.step-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-align: center; }
+.step-line {
+    position: absolute;
+    top: 17px; right: calc(50% + 17px);
+    width: calc(100% - 34px);
+    height: 2px;
+    background: var(--border);
+    z-index: 0;
+}
+.step-line.done { background: var(--brand); }
+
+/* Order form card */
+.order-form-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    position: sticky;
+    top: 76px;
+}
+.ofc-header {
+    padding: 16px 20px;
+    background: linear-gradient(135deg, var(--brand) 0%, #00a878 100%);
+    color: #053023;
+    font-size: 14px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.ofc-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+
+/* Deposit info box */
+.deposit-box {
+    background: linear-gradient(135deg, rgba(0,200,150,.08) 0%, rgba(0,200,150,.03) 100%);
+    border: 1.5px solid rgba(0,200,150,.25);
+    border-radius: 12px;
+    padding: 14px 16px;
+}
+.deposit-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--brand);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.deposit-amounts { display: flex; flex-direction: column; gap: 6px; }
+.deposit-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+}
+.deposit-row .lbl { color: var(--text-muted); }
+.deposit-row .val { font-weight: 700; }
+.deposit-row.total .val { font-size: 18px; color: var(--brand); font-weight: 900; }
+.deposit-row.deposit .val { font-size: 14px; color: #f59e0b; }
+
+/* Qty selector */
+.qty-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+}
+.qty-btn {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    border: none;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s;
+}
+.qty-btn:hover { background: var(--brand); color: #053023; }
+.qty-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--text);
+    font-family: inherit;
+    outline: none;
+    min-width: 0;
+}
+
+/* Form fields */
+.field-group { display: flex; flex-direction: column; gap: 5px; }
+.field-label { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+.field-input {
+    padding: 10px 13px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface-2);
+    color: var(--text);
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color .2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+.field-input:focus { border-color: var(--brand); }
+.field-input::placeholder { color: var(--text-muted); }
+
+/* ═══ CTA ROW: زرين جنباً إلى جنب ═══ */
+.cta-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+/* زر دفع العربون */
+.btn-deposit {
+    padding: 14px 10px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 900;
+    font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    transition: all .25s;
+    background: linear-gradient(135deg, var(--brand) 0%, #00a878 100%);
+    color: #053023;
+    box-shadow: 0 4px 14px rgba(0,200,150,.3);
+    text-align: center;
+    line-height: 1.3;
+}
+.btn-deposit:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,200,150,.35); }
+.btn-deposit:active { transform: none; }
+.btn-deposit:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+/* زر تقديم للتاجر */
+.btn-merchant {
+    padding: 14px 10px;
+    border-radius: 12px;
+    border: 2px solid rgba(37,211,102,.4);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 900;
+    font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    transition: all .25s;
+    background: rgba(37,211,102,.08);
+    color: var(--text);
+    text-align: center;
+    line-height: 1.3;
+}
+.btn-merchant:hover { border-color: #25d366; background: rgba(37,211,102,.15); color: #25d366; transform: translateY(-2px); }
+.btn-merchant:active { transform: none; }
+.btn-merchant:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+/* Info chips */
+.info-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+}
+.chip.green { background: rgba(0,200,150,.08); border-color: rgba(0,200,150,.25); color: var(--brand); }
+.chip.gold  { background: rgba(245,158,11,.08); border-color: rgba(245,158,11,.25); color: #f59e0b; }
+
+/* Success overlay */
+.success-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+}
+.success-overlay.show { display: flex; }
+.success-card {
+    background: var(--surface);
+    border: 1.5px solid var(--brand);
+    border-radius: 20px;
+    padding: 36px 32px;
+    max-width: 460px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+}
+.success-icon {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: rgba(0,200,150,.12);
+    border: 2px solid var(--brand);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px;
+    font-size: 32px;
+}
+.success-title { font-size: 20px; font-weight: 900; margin-bottom: 8px; }
+.success-sub { font-size: 13px; color: var(--text-muted); line-height: 1.7; margin-bottom: 22px; }
+.success-ref {
+    background: var(--surface-2);
+    border: 1px dashed var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 12px;
+    margin-bottom: 20px;
+}
+.success-ref code {
+    font-size: 15px;
+    font-weight: 900;
+    color: var(--brand);
+    letter-spacing: 0.04em;
+}
+.success-btns { display: flex; gap: 10px; flex-direction: column; }
+
+/* ═══════════════════════════════════
+   PAYMENT OPTIONS & INLINE DCB STYLE
+   ═══════════════════════════════════ */
+.pay-methods-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 6px;
+}
+.pay-method-card {
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    background: var(--surface-2);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    position: relative;
+    user-select: none;
+}
+.pay-method-card:hover {
+    border-color: var(--brand);
+    background: rgba(0, 200, 150, 0.02);
+}
+.pay-method-card.active {
+    border-color: var(--brand) !important;
+    background: rgba(0, 200, 150, 0.05) !important;
+    box-shadow: 0 4px 12px rgba(0, 200, 150, 0.08);
+}
+.pay-method-card.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    border-color: var(--border) !important;
+    background: var(--surface-2) !important;
+}
+.pay-method-card.disabled:hover {
+    border-color: var(--border) !important;
+    transform: none;
+}
+.pay-method-card input[type="radio"] {
+    accent-color: var(--brand);
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    margin-top: 2px;
+}
+
+/* Carrier selectors */
+.carrier-select-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+}
+.carrier-btn {
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 6px;
+    cursor: pointer;
+    background: var(--surface);
+    transition: all 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+}
+.carrier-logo {
+    height: 32px;
+    max-width: 100%;
+    object-fit: contain;
+    pointer-events: none;
+}
+.carrier-btn.active[data-carrier="mobilis"] {
+    border-color: #25d366 !important;
+    background: rgba(37, 211, 102, 0.08) !important;
+    color: #25d366;
+}
+.carrier-btn.active[data-carrier="djezzy"] {
+    border-color: #e84118 !important;
+    background: rgba(232, 65, 24, 0.08) !important;
+    color: #e84118;
+}
+.carrier-btn.active[data-carrier="ooredoo"] {
+    border-color: #ed1c24 !important;
+    background: rgba(237, 28, 36, 0.08) !important;
+    color: #ed1c24;
+}
+.carrier-btn:hover:not(.active) {
+    border-color: var(--brand);
+    background: rgba(0, 200, 150, 0.02);
+}
+
+/* Warnings and inline boxes */
+.payment-warning-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    color: #f59e0b;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-top: 8px;
+    line-height: 1.5;
+}
+.inline-payment-panel {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    animation: fadeIn .3s ease;
+}
+.otp-verify-panel {
+    background: rgba(0, 200, 150, 0.04);
+    border: 1.5px dashed var(--brand);
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: slideDown .3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+</head>
+<body>
+
+<!-- ── TOP BAR ── -->
+<header class="order-topbar">
+    <a href="wholesale.html" class="back-link">
+        <span class="material-symbols-outlined" style="font-size:16px;">arrow_forward</span>
+        العودة للسوق
+    </a>
+    <div style="display:flex;align-items:center;gap:10px;">
+        <img src="images/8ff734c4-bd08-4561-b901-66de057fb3fc_removalai_preview.png"
+             alt="كلش هنا B2B" style="height:30px;object-fit:contain;"/>
+        <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="تبديل المظهر"
+                style="display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface-2);font-size:12px;font-family:inherit;cursor:pointer;color:var(--text);">
+            <span class="material-symbols-outlined" style="font-size:16px;" id="themeIcon">light_mode</span>
+            <span id="themeLabel">فاتح</span>
+        </button>
+    </div>
+</header>
+
+<!-- ── PAGE CONTENT ── -->
+<div class="order-page" id="orderPage" style="display:none;">
+
+    <!-- LEFT: Product Details -->
+    <div>
+        <div class="prod-info-card">
+            <img id="prodImg" class="prod-img-big" src="" alt="صورة المنتج"
+                 onerror="this.src='images/placeholder.png'"/>
+            <div class="prod-info-body">
+                <div class="prod-title" id="prodName">—</div>
+                <div class="prod-merchant-row">
+                    <span class="material-symbols-outlined" style="font-size:15px;">store</span>
+                    <span id="prodMerchant">—</span>
+                    <span class="verified-chip">
+                        <span class="material-symbols-outlined" style="font-size:12px;">verified</span>
+                        مورد موثّق
+                    </span>
+                </div>
+
+                <!-- Price tiers -->
+                <table class="tier-table">
+                    <thead>
+                        <tr>
+                            <th>الكمية</th>
+                            <th>سعر الحبة</th>
+                            <th>وفورات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tierTableBody"></tbody>
+                </table>
+
+                <div class="info-chips">
+                    <span class="chip green">
+                        <span class="material-symbols-outlined" style="font-size:12px;">verified_user</span>
+                        ضمان العربون
+                    </span>
+                    <span class="chip gold">
+                        <span class="material-symbols-outlined" style="font-size:12px;">payments</span>
+                        دفع 20% عربون
+                    </span>
+                    <span class="chip">
+                        <span class="material-symbols-outlined" style="font-size:12px;">local_shipping</span>
+                        شحن متاح
+                    </span>
+                </div>
+
+                <div class="prod-desc" id="prodDesc">—</div>
+            </div>
+        </div>
+
+        <!-- How it works -->
+        <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:16px;padding:20px;margin-top:16px;">
+            <div style="font-size:13px;font-weight:900;margin-bottom:14px;display:flex;align-items:center;gap:7px;">
+                <span class="material-symbols-outlined" style="font-size:18px;color:var(--brand);">help_outline</span>
+                كيف تعمل العملية؟
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+                <div style="display:flex;gap:12px;align-items:flex-start;">
+                    <div style="width:28px;height:28px;border-radius:50%;background:rgba(0,200,150,.12);border:1.5px solid rgba(0,200,150,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:var(--brand);flex-shrink:0;">1</div>
+                    <div>
+                        <div style="font-size:12px;font-weight:800;">أدخل بياناتك وادفع العربون (20%)</div>
+                        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">العربون يُحجز لدى المنصة ويضمن جديّة طلبك</div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:flex-start;">
+                    <div style="width:28px;height:28px;border-radius:50%;background:rgba(245,158,11,.10);border:1.5px solid rgba(245,158,11,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#f59e0b;flex-shrink:0;">2</div>
+                    <div>
+                        <div style="font-size:12px;font-weight:800;">تواصل مباشرة مع التاجر</div>
+                        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">اتفق معه على التفاصيل: الكميات، الشحن، موعد الاستلام</div>
+                    </div>
+                </div>
+                <div style="display:flex;gap:12px;align-items:flex-start;">
+                    <div style="width:28px;height:28px;border-radius:50%;background:rgba(99,102,241,.10);border:1.5px solid rgba(99,102,241,.25);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#818cf8;flex-shrink:0;">3</div>
+                    <div>
+                        <div style="font-size:12px;font-weight:800;">استلم بضاعتك وادفع الباقي</div>
+                        <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">الباقي يُسدَّد عند الاستلام أو حسب الاتفاق مع التاجر</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: Order Form -->
+    <div>
+        <div class="order-form-card">
+            <div class="ofc-header">
+                <span class="material-symbols-outlined">shopping_cart_checkout</span>
+                إتمام طلب الجملة
+            </div>
+            <div class="ofc-body">
+
+                <!-- Quantity -->
+                <div class="field-group">
+                    <div class="field-label">الكمية المطلوبة (الحد الأدنى: <span id="moqLabel">10</span> قطع)</div>
+                    <div class="qty-selector">
+                        <button class="qty-btn" onclick="adjustQty(-10)">−</button>
+                        <input class="qty-input" type="number" id="qtyInput" value="10" min="10" onchange="recalculate()"/>
+                        <button class="qty-btn" onclick="adjustQty(10)">+</button>
+                    </div>
+                </div>
+
+                <!-- Deposit summary -->
+                <div class="deposit-box">
+                    <div class="deposit-title">
+                        <span class="material-symbols-outlined" style="font-size:14px;">calculate</span>
+                        حساب العربون
+                    </div>
+                    <div class="deposit-amounts">
+                        <div class="deposit-row">
+                            <span class="lbl">سعر الحبة</span>
+                            <span class="val" id="unitPriceLbl">—</span>
+                        </div>
+                        <div class="deposit-row total">
+                            <span class="lbl" style="font-size:13px;">المجموع الكلي</span>
+                            <span class="val" id="totalLbl">—</span>
+                        </div>
+                        <div class="deposit-row deposit">
+                            <span class="lbl" style="font-size:13px;">🔒 العربون (20%)</span>
+                            <span class="val" id="depositLbl">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buyer info -->
+                <div class="field-group">
+                    <div class="field-label">الاسم الكامل *</div>
+                    <input class="field-input" type="text" id="buyerName" placeholder="محمد بوعزيز"/>
+                </div>
+                <div class="field-group">
+                    <div class="field-label">رقم الهاتف *</div>
+                    <input class="field-input" type="tel" id="buyerPhone" placeholder="0555 123 456"/>
+                </div>
+                <div class="field-group">
+                    <div class="field-label">الولاية</div>
+                    <input class="field-input" type="text" id="buyerWilaya" placeholder="مثال: الجزائر العاصمة"/>
+                </div>
+                <div class="field-group">
+                    <div class="field-label">ملاحظات (اختياري)</div>
+                    <textarea class="field-input" id="buyerNotes" rows="2" placeholder="ألوان، مقاسات، تعليمات خاصة..."></textarea>
+                </div>
+
+                <!-- Payment Method Selection -->
+                <div class="field-group" style="margin-top: 10px;">
+                    <div class="field-label">طريقة الدفع *</div>
+                    <div class="pay-methods-grid">
+                        <!-- Option 1: Deposit via Platform -->
+                        <div class="pay-method-card active" id="payMethodCardPlatform" onclick="selectPaymentMethod('platform')">
+                            <input type="radio" name="payment_choice" id="payChoicePlatform" value="platform" checked style="pointer-events: none;" />
+                            <div style="flex: 1;">
+                                <div style="font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 6px;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; color: var(--brand);">payments</span>
+                                    عربون عبر المنصة (20%)
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">
+                                    حجز فوري ومؤكد للمنتجات عن طريق خصم العربون من رصيد الهاتف.
+                                </div>
+                                <!-- API warning message -->
+                                <div id="dcbApiWarning" class="payment-warning-banner" style="display: none;">
+                                    <span class="material-symbols-outlined" style="font-size:16px;">warning</span>
+                                    <span>بوابة الدفع بالرصيد غير متوفرة حالياً. يرجى تحديد وسيلة الدفع الأخرى.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Option 2: Cash on Delivery -->
+                        <div class="pay-method-card" id="payMethodCardCod" onclick="selectPaymentMethod('cod')">
+                            <input type="radio" name="payment_choice" id="payChoiceCod" value="cod" style="pointer-events: none;" />
+                            <div style="flex: 1;">
+                                <div style="font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 6px;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; color: #818cf8;">local_shipping</span>
+                                    الدفع عند الاستلام (COD)
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; line-height: 1.4;">
+                                    تقديم طلب الجملة والتواصل مع المورد مباشرة لشحن البضاعة والدفع نقداً بالكامل.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inline DCB Carrier & Phone Selection -->
+                <div id="inlineDcbPanel" class="inline-payment-panel">
+                    <div style="font-size: 11px; font-weight: 700; color: var(--text-muted);">اختر شبكة الهاتف للدفع:</div>
+                    <div class="carrier-select-grid">
+                        <button class="carrier-btn" type="button" data-carrier="mobilis" onclick="setCarrier('mobilis')">
+                            <img src="images/mobilis.webp" alt="Mobilis" class="carrier-logo" />
+                        </button>
+                        <button class="carrier-btn" type="button" data-carrier="djezzy" onclick="setCarrier('djezzy')">
+                            <img src="images/djezzy.webp" alt="Djezzy" class="carrier-logo" />
+                        </button>
+                        <button class="carrier-btn" type="button" data-carrier="ooredoo" onclick="setCarrier('ooredoo')">
+                            <img src="images/ooredoo.webp" alt="Ooredoo" class="carrier-logo" />
+                        </button>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 5px; margin-top: 5px;">
+                        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted);">رقم الهاتف للدفع بالرصيد:</div>
+                        <input class="field-input" type="tel" id="dcbPhone" placeholder="مثال: 0550123456" style="text-align: center; font-size: 14px; font-weight: bold; letter-spacing: 1px;" />
+                    </div>
+                    <div id="dcbErrorText" style="color: #ff4757; font-size: 11px; display: none; font-weight: bold;"></div>
+                </div>
+
+                <!-- Inline OTP Verification Panel -->
+                <div id="inlineOtpPanel" class="otp-verify-panel" style="display: none;">
+                    <div style="font-size: 12px; font-weight: 800; color: var(--brand); display: flex; align-items: center; gap: 5px;">
+                        <span class="material-symbols-outlined" style="font-size:16px;">lock</span>
+                        رمز التحقق OTP (أرسل إلى الهاتف)
+                    </div>
+                    <p style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                        أدخل الرمز المكون من 6 أرقام لتأكيد عملية الدفع.
+                    </p>
+                    <input type="text" id="dcbOtpInput" placeholder="XXXXXX" maxlength="6" style="text-align: center; letter-spacing: 6px; font-size: 16px; font-weight: bold; padding: 10px; border-radius: 8px; border: 1.5px solid var(--brand); background: var(--surface); color: var(--text); outline: none; width: 100%; box-sizing: border-box;" />
+                    <div style="display:flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                        <div id="inlineTimerText" style="font-size: 11px; color: #ff9f43; font-weight: 700;">الوقت المتبقي: 02:00</div>
+                        <button id="inlineResendOtpBtn" type="button" onclick="resendInlineOtp()" disabled style="background: transparent; border: none; color: var(--text-muted); font-size: 11px; text-decoration: underline; cursor: not-allowed; font-family: inherit;">إعادة إرسال الرمز</button>
+                    </div>
+                    <div id="dcbOtpErrorText" style="color: #ff4757; font-size: 11px; display: none; font-weight: bold;"></div>
+                </div>
+
+                <!-- ══ UNIFIED SUBMIT BUTTON ══ -->
+                <div style="margin-top: 14px;">
+                    <button class="btn-deposit" id="submitOrderBtn" onclick="handleUnifiedSubmit()" style="width: 100%; padding: 15px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-direction: row; line-height: 1.5;">
+                        <span class="material-symbols-outlined" id="submitBtnIcon" style="font-size:18px;">payments</span>
+                        <span id="submitBtnText" style="font-size: 13px; font-weight: 900;">طلب رمز OTP وتأكيد الهاتف</span>
+                    </button>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading state -->
+<div id="loadingState" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;">
+    <div class="spinner"></div>
+    <p style="font-size:13px;color:var(--text-muted);">جاري تحميل بيانات المنتج...</p>
+</div>
+
+<!-- Not found state -->
+<div id="notFoundState" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px;text-align:center;padding:40px;">
+    <span class="material-symbols-outlined" style="font-size:64px;color:var(--text-muted);">search_off</span>
+    <div style="font-size:18px;font-weight:900;">لم يُعثر على المنتج</div>
+    <p style="font-size:13px;color:var(--text-muted);">ربما تم حذف المنتج أو انتهت صلاحية الرابط.</p>
+    <a href="wholesale.html" class="btn-deposit" style="width:auto;padding:12px 28px;text-decoration:none;">
+        العودة للسوق
+    </a>
+</div>
+
+<!-- ══ SUCCESS OVERLAY: عربون دُفع ══ -->
+<div class="success-overlay" id="successDepositOverlay">
+    <div class="success-card">
+        <div class="success-icon">💳</div>
+        <div class="success-title">تم تسجيل طلب العربون!</div>
+        <div class="success-sub">
+            تم تسجيل طلبك بنجاح بحالة <strong style="color:var(--brand);">عربون تم</strong>.<br/>
+            سيتواصل معك التاجر قريباً لإتمام تفاصيل الشحن والدفع الكامل.
+        </div>
+        <div class="success-ref">
+            رقم مرجعي: <code id="refCodeDeposit">—</code>
+        </div>
+        <div class="success-btns">
+            <button class="btn-deposit" onclick="openWhatsAppFromSuccess()">
+                <i class="fab fa-whatsapp"></i>
+                تواصل مع التاجر الآن
+            </button>
+            <a href="wholesale.html" style="width:100%;padding:12px;border-radius:12px;border:1.5px solid var(--border);background:transparent;text-align:center;font-size:13px;font-weight:700;color:var(--text);text-decoration:none;display:block;">
+                العودة للسوق
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ══ SUCCESS OVERLAY: طلب للتاجر ══ -->
+<div class="success-overlay" id="successMerchantOverlay">
+    <div class="success-card">
+        <div class="success-icon" style="font-size:42px;">📲</div>
+        <div class="success-title">تم تقديم طلبك للتاجر!</div>
+        <div class="success-sub">
+            تم حفظ طلبك بحالة <strong style="color:#25d366;">في انتظار التواصل</strong>.<br/>
+            يُفتح واتساب التاجر تلقائياً — أكمل المحادثة لإتمام الصفقة.
+        </div>
+        <div class="success-ref">
+            رقم مرجعي: <code id="refCodeMerchant">—</code>
+        </div>
+        <div class="success-btns">
+            <a href="wholesale.html" style="width:100%;padding:14px;border-radius:12px;background:var(--brand);text-align:center;font-size:14px;font-weight:900;color:#053023;text-decoration:none;display:block;">
+                العودة للسوق
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- ══ SCRIPTS ══ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/dcb-engine.js"></script>
+<script>
+/* ═══════════════════════════════════════════════
+   WHOLESALE ORDER PAGE — JS
+═══════════════════════════════════════════════ */
+
+let product     = null;
+let merchant    = null;
+let MOQ         = 10;
+
+/* ── Theme ── */
+function applyTheme() {
+    const t = localStorage.getItem('kh_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', t);
+    const icon  = document.getElementById('themeIcon');
+    const label = document.getElementById('themeLabel');
+    if (icon)  icon.textContent  = t === 'dark' ? 'dark_mode' : 'light_mode';
+    if (label) label.textContent = t === 'dark' ? 'داكن' : 'فاتح';
+}
+function toggleTheme() {
+    const cur  = document.documentElement.getAttribute('data-theme') || 'light';
+    const next = cur === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('kh_theme', next);
+    applyTheme();
+}
+applyTheme();
+
+/* ── Boot ── */
+document.addEventListener('DOMContentLoaded', () => {
+    loadProduct();
+});
+
+async function loadProduct() {
+    const supabase = window.getSupabaseClient?.();
+    const params   = new URLSearchParams(location.search);
+    const pid      = params.get('pid');
+
+    // Try sessionStorage first (fast path)
+    const cached = sessionStorage.getItem('b2b_selected_product');
+    if (cached) {
+        try {
+            product = JSON.parse(cached);
+            if (!pid || String(product.id) === pid) {
+                if (product.show_in_b2b === false) { showNotFound(); return; }
+                await fetchMerchant(product.owner);
+                renderPage();
+                return;
+            }
+        } catch {}
+    }
+
+    // Fallback: fetch from DB
+    if (!supabase || !pid) { showNotFound(); return; }
+    try {
+        const { data, error } = await supabase
+            .from('products')
+            .select('*')
+            .eq('id', pid)
+            .single();
+        if (error || !data || data.show_in_b2b === false) { showNotFound(); return; }
+        product = data;
+        await fetchMerchant(product.owner);
+        renderPage();
+    } catch { showNotFound(); }
+}
+
+async function fetchMerchant(ownerEmail) {
+    const supabase = window.getSupabaseClient?.();
+    if (!supabase || !ownerEmail) return;
+    try {
+        const { data } = await supabase
+            .from('merchant')
+            .select('name,phone,whatsapp,logo')
+            .eq('email', ownerEmail)
+            .single();
+        merchant = data || { name: 'مورد معتمد', phone: '', whatsapp: '' };
+        // Inject merchant info into product
+        product.merchant_name     = merchant.name;
+        product.merchant_phone    = merchant.phone    || '';
+        product.merchant_whatsapp = merchant.whatsapp || merchant.phone || '';
+    } catch { merchant = { name: 'مورد معتمد', phone: '', whatsapp: '' }; }
+}
+
+function showNotFound() {
+    document.getElementById('loadingState').style.display  = 'none';
+    document.getElementById('notFoundState').style.display = 'flex';
+}
+
+function calculateUnitPrice(qty) {
+    let price = parseFloat(product.wholesale_price);
+    const discounts = product.details?.volume_discounts || [];
+    if (discounts.length > 0) {
+        // شرائح الخصم محددة من التاجر
+        const sortedDiscounts = [...discounts].sort((a,b) => b.min_qty - a.min_qty);
+        for (let d of sortedDiscounts) {
+            if (qty >= d.min_qty) {
+                price = parseFloat(d.price);
+                break;
+            }
+        }
+    }
+    // إذا لم يحدد التاجر شرائح -> السعر الأساسي فقط
+    return price;
+}
+
+function renderPage() {
+    if (!product) { showNotFound(); return; }
+
+    MOQ = product.min_order_qty || (product.details?.moq ? parseInt(product.details.moq) : 10) || 10;
+
+    // Product image
+    document.getElementById('prodImg').src = product.image || 'images/placeholder.png';
+    document.getElementById('prodName').textContent     = product.name;
+    document.getElementById('prodMerchant').textContent = product.merchant_name || 'مورد معتمد';
+    document.getElementById('prodDesc').textContent     = product.description || 'لا يوجد وصف متاح.';
+
+    // Tiers
+    const price   = parseFloat(product.wholesale_price);
+    const tbody   = document.getElementById('tierTableBody');
+    const discounts = product.details?.volume_discounts || [];
+    
+    if (discounts.length > 0) {
+        // شرائح خصم حددها التاجر
+        const sorted = [...discounts].sort((a,b) => a.min_qty - b.min_qty);
+        let html = '';
+
+        // إذا كانت أول شريحة تبدأ فوق MOQ → أضف السعر الأساسي
+        if (sorted[0].min_qty > MOQ) {
+            html += `
+                <tr>
+                    <td>${MOQ}–${sorted[0].min_qty - 1} قطعة</td>
+                    <td class="tier-best">${price.toLocaleString('ar-DZ')} دج</td>
+                    <td>—</td>
+                </tr>`;
+        }
+
+        for (let i = 0; i < sorted.length; i++) {
+            const current = sorted[i];
+            const next = sorted[i + 1];
+            const rangeStr = next ? `${current.min_qty}–${next.min_qty - 1} قطعة` : `${current.min_qty}+ قطعة`;
+            const tierPrice = parseFloat(current.price);
+            const discountPercent = Math.round((1 - (tierPrice / price)) * 100);
+            const discountText = discountPercent > 0
+                ? `<span style="color:#f59e0b;font-weight:700;">${discountPercent}% خصم</span>`
+                : '—';
+
+            html += `
+                <tr>
+                    <td>${rangeStr}</td>
+                    <td class="tier-good">${tierPrice.toLocaleString('ar-DZ')} دج</td>
+                    <td>${discountText}</td>
+                </tr>`;
+        }
+        tbody.innerHTML = html;
+    } else {
+        // التاجر لم يحدد شرائح خصم → سعر ثابت فقط
+        tbody.innerHTML = `
+            <tr>
+                <td>${MOQ}+ قطعة</td>
+                <td class="tier-best">${price.toLocaleString('ar-DZ')} دج</td>
+                <td>—</td>
+            </tr>`;
+    }
+
+    // Qty + deposit
+    document.getElementById('moqLabel').textContent = MOQ;
+    const qtyInput = document.getElementById('qtyInput');
+    qtyInput.value = MOQ;
+    qtyInput.min   = MOQ;
+
+    recalculate();
+
+    // Pre-fill user info
+    try {
+        const saved = JSON.parse(localStorage.getItem('kh_user_info') || '{}');
+        if (saved.name)  document.getElementById('buyerName').value  = saved.name;
+        if (saved.phone) document.getElementById('buyerPhone').value = saved.phone;
+    } catch {}
+
+    // Update page title
+    document.title = `طلب: ${product.name} — كلش هنا B2B`;
+
+    // Show page
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('orderPage').style.display    = 'grid';
+    
+    // Check DCB availability
+    checkDcbAvailability();
+}
+
+function recalculate() {
+    if (!product) return;
+    const qty     = Math.max(MOQ, parseInt(document.getElementById('qtyInput').value) || MOQ);
+    const unitPrice = calculateUnitPrice(qty);
+    const total   = unitPrice * qty;
+    const deposit = total * 0.20;
+
+    document.getElementById('unitPriceLbl').textContent  = `${unitPrice.toLocaleString('ar-DZ')} دج`;
+    document.getElementById('totalLbl').textContent      = `${Math.round(total).toLocaleString('ar-DZ')} دج`;
+    document.getElementById('depositLbl').textContent    = `${Math.round(deposit).toLocaleString('ar-DZ')} دج`;
+}
+
+function adjustQty(delta) {
+    const input = document.getElementById('qtyInput');
+    let v = (parseInt(input.value) || MOQ) + delta;
+    input.value = Math.max(MOQ, v);
+    recalculate();
+}
+
+/* ══════════════════════════════════════════════════
+   SHARED: collect form + calculate
+   ══════════════════════════════════════════════════ */
+function collectOrderData() {
+    const qty    = Math.max(MOQ, parseInt(document.getElementById('qtyInput').value) || MOQ);
+    const name   = document.getElementById('buyerName').value.trim();
+    const phone  = document.getElementById('buyerPhone').value.trim();
+    const wilaya = document.getElementById('buyerWilaya').value.trim();
+    const notes  = document.getElementById('buyerNotes').value.trim();
+    const unitPrice = calculateUnitPrice(qty);
+    const total     = Math.round(unitPrice * qty);
+    const deposit   = Math.round(total * 0.20);
+    return { qty, name, phone, wilaya, notes, unitPrice, total, deposit };
+}
+
+function buildOrderPayload({ qty, name, phone, wilaya, notes, unitPrice, total, deposit, refCode, status }) {
+    return {
+        merchant_email:   product.owner,
+        customer_name:    name || 'عميل B2B',
+        customer_phone:   phone || '',
+        customer_address: wilaya || null,
+        items: [{
+            id:             product.id,
+            name:           product.name,
+            qty,
+            price:          unitPrice,
+            image:          product.image || '',
+            wholesale:      true,
+            deposit_amount: deposit,
+            ref_code:       refCode
+        }],
+        total_price:      deposit,
+        notes:            `[B2B جملة${status === 'deposit_paid' ? ' | المنصة' : ' | واتساب'}] ${notes ? notes + ' | ' : ''}الكمية: ${qty} | إجمالي: ${total.toLocaleString('ar-DZ')} دج | العربون: ${deposit.toLocaleString('ar-DZ')} دج | Ref: ${refCode}`,
+        status,
+        discount_applied: 0,
+        deleted_by_merchant: false,
+        created_at:       new Date().toISOString()
+    };
+}
+
+let isDcbAvailable      = false;
+let selectedPaymentMethod = 'platform'; // 'platform' or 'cod'
+let selectedCarrier      = null;
+let inlineDcbTransactionId = null;
+let inlineOtpTimerInterval = null;
+
+async function checkDcbAvailability() {
+    const supabase = window.getSupabaseClient?.();
+    if (!supabase || !window.DCBEngine) {
+        setDcbUnavailable();
+        return;
+    }
+
+    try {
+        const { data: settings, error } = await supabase
+            .from('dcb_settings')
+            .select('is_enabled, supported_carriers')
+            .limit(1)
+            .single();
+
+        if (error || !settings || !settings.is_enabled) {
+            setDcbUnavailable();
+            return;
+        }
+
+        const supported = settings.supported_carriers || [];
+        if (supported.length === 0) {
+            setDcbUnavailable();
+            return;
+        }
+
+        isDcbAvailable = true;
+        document.getElementById('dcbApiWarning').style.display = 'none';
+        document.getElementById('payMethodCardPlatform').classList.remove('disabled');
+        
+        // Hide unsupported carriers
+        const carrierButtons = document.querySelectorAll('.carrier-btn');
+        carrierButtons.forEach(btn => {
+            const carrier = btn.dataset.carrier;
+            if (supported.includes(carrier)) {
+                btn.style.display = 'flex';
+            } else {
+                btn.style.display = 'none';
+            }
+        });
+
+        // Set default carrier (first supported)
+        setCarrier(supported[0]);
+
+        // Select platform payment by default
+        selectPaymentMethod('platform');
+        
+    } catch (err) {
+        console.error('Check DCB availability error:', err);
+        setDcbUnavailable();
+    }
+}
+
+function setDcbUnavailable() {
+    isDcbAvailable = false;
+    document.getElementById('dcbApiWarning').style.display = 'flex';
+    const platCard = document.getElementById('payMethodCardPlatform');
+    platCard.classList.add('disabled');
+    
+    // Switch to COD automatically
+    selectPaymentMethod('cod');
+}
+
+function selectPaymentMethod(method) {
+    if (method === 'platform' && !isDcbAvailable) {
+        return;
+    }
+
+    selectedPaymentMethod = method;
+
+    const platCard = document.getElementById('payMethodCardPlatform');
+    const codCard = document.getElementById('payMethodCardCod');
+    const platRadio = document.getElementById('payChoicePlatform');
+    const codRadio = document.getElementById('payChoiceCod');
+
+    if (method === 'platform') {
+        platCard.classList.add('active');
+        codCard.classList.remove('active');
+        platRadio.checked = true;
+        codRadio.checked = false;
+        
+        document.getElementById('inlineDcbPanel').style.display = 'flex';
+        
+        updateSubmitButtonState('initiate');
+    } else {
+        codCard.classList.add('active');
+        platCard.classList.remove('active');
+        codRadio.checked = true;
+        platRadio.checked = false;
+        
+        document.getElementById('inlineDcbPanel').style.display = 'none';
+        document.getElementById('inlineOtpPanel').style.display = 'none';
+        if (inlineOtpTimerInterval) {
+            clearInterval(inlineOtpTimerInterval);
+        }
+        
+        updateSubmitButtonState('cod');
+    }
+}
+
+function setCarrier(carrier) {
+    selectedCarrier = carrier;
+    const buttons = document.querySelectorAll('.carrier-btn');
+    buttons.forEach(btn => {
+        if (btn.dataset.carrier === carrier) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    
+    // Pre-fill phone number from form phone
+    const payPhone = document.getElementById('dcbPhone');
+    const formPhone = document.getElementById('buyerPhone').value.trim();
+    if (!payPhone.value && formPhone) {
+        payPhone.value = formPhone;
+    }
+}
+
+function updateSubmitButtonState(state) {
+    const btn = document.getElementById('submitOrderBtn');
+    const icon = document.getElementById('submitBtnIcon');
+    const text = document.getElementById('submitBtnText');
+    
+    btn.disabled = false;
+    
+    if (state === 'initiate') {
+        btn.className = 'btn-deposit';
+        btn.style.background = 'linear-gradient(135deg, var(--brand) 0%, #00a878 100%)';
+        btn.style.color = '#053023';
+        btn.style.boxShadow = '0 4px 14px rgba(0,200,150,.3)';
+        icon.className = 'material-symbols-outlined';
+        icon.style.display = 'inline-block';
+        icon.style.fontSize = '18px';
+        icon.textContent = 'send';
+        text.textContent = 'طلب رمز OTP وتأكيد الهاتف';
+    } else if (state === 'verify') {
+        btn.className = 'btn-deposit';
+        btn.style.background = 'linear-gradient(135deg, var(--brand) 0%, #00a878 100%)';
+        btn.style.color = '#053023';
+        btn.style.boxShadow = '0 4px 14px rgba(0,200,150,.3)';
+        icon.className = 'material-symbols-outlined';
+        icon.style.display = 'inline-block';
+        icon.style.fontSize = '18px';
+        icon.textContent = 'check_circle';
+        text.textContent = 'تأكيد الدفع وإتمام الطلب';
+    } else if (state === 'cod') {
+        btn.className = 'btn-merchant';
+        btn.style.background = 'rgba(37,211,102,.08)';
+        btn.style.border = '2px solid rgba(37,211,102,.4)';
+        btn.style.color = 'var(--text)';
+        btn.style.boxShadow = 'none';
+        icon.className = 'fab fa-whatsapp';
+        icon.style.display = 'inline-block';
+        icon.style.fontSize = '18px';
+        icon.style.color = '#25d366';
+        icon.textContent = '';
+        text.textContent = 'تقديم الطلب للتاجر (الدفع عند الاستلام)';
+    } else if (state === 'loading') {
+        btn.disabled = true;
+        icon.className = 'material-symbols-outlined fa-spin';
+        icon.textContent = 'autorenew';
+        text.textContent = 'جاري المعالجة...';
+    }
+}
+
+async function handleUnifiedSubmit() {
+    const d = collectOrderData();
+    if (!d.name || !d.phone) {
+        alert('يرجى ملء الاسم الكامل ورقم الهاتف في الاستمارة أولاً.');
+        return;
+    }
+
+    if (selectedPaymentMethod === 'cod') {
+        await submitCodOrder(d);
+    } else {
+        const otpPanel = document.getElementById('inlineOtpPanel');
+        if (otpPanel.style.display === 'none') {
+            await initiateInlinePayment(d);
+        } else {
+            await verifyInlineOtp();
+        }
+    }
+}
+
+async function initiateInlinePayment(orderData) {
+    const phone = document.getElementById('dcbPhone').value.trim();
+    const carrier = selectedCarrier;
+    const errorEl = document.getElementById('dcbErrorText');
+    
+    if (!carrier) {
+        errorEl.textContent = 'يرجى اختيار شبكة الهاتف أولاً.';
+        errorEl.style.display = 'block';
+        return;
+    }
+
+    if (!phone || !/^(0|213)[567]\d{8}$/.test(phone)) {
+        errorEl.textContent = 'يرجى إدخال رقم هاتف جزائري صحيح (مثال: 0550123456)';
+        errorEl.style.display = 'block';
+        return;
+    }
+    errorEl.style.display = 'none';
+
+    updateSubmitButtonState('loading');
+    
+    try {
+        if (!window.DCBEngine) {
+            throw new Error('محرك الدفع غير متوفر حالياً.');
+        }
+
+        const depositAmount = orderData.deposit;
+        const cartItems = [{
+            merchantEmail: product.owner,
+            amount: parseFloat(depositAmount)
+        }];
+
+        const initRes = await window.DCBEngine.initiatePayment(phone, carrier, parseFloat(depositAmount), cartItems);
+        
+        if (initRes.success) {
+            inlineDcbTransactionId = initRes.transactionId;
+            window._dcbOrderData = orderData;
+            window._dcbSelectedCarrier = carrier;
+            window._dcbTransactionId = initRes.transactionId;
+            
+            document.getElementById('inlineOtpPanel').style.display = 'block';
+            document.getElementById('dcbPhone').disabled = true;
+            document.querySelectorAll('.carrier-btn').forEach(btn => btn.style.pointerEvents = 'none');
+            
+            const expiryDate = new Date(initRes.otpExpiry);
+            startInlineOtpTimer(expiryDate);
+            
+            updateSubmitButtonState('verify');
+        } else {
+            errorEl.textContent = initRes.error || 'فشلت عملية تهيئة الدفع.';
+            errorEl.style.display = 'block';
+            updateSubmitButtonState('initiate');
+        }
+    } catch (err) {
+        console.error(err);
+        errorEl.textContent = 'حدث خطأ: ' + (err.message || 'خطأ غير معروف');
+        errorEl.style.display = 'block';
+        updateSubmitButtonState('initiate');
+    }
+}
+
+function startInlineOtpTimer(expiryDate) {
+    if (inlineOtpTimerInterval) clearInterval(inlineOtpTimerInterval);
+    
+    const display = document.getElementById('inlineTimerText');
+    const resendBtn = document.getElementById('inlineResendOtpBtn');
+    
+    inlineOtpTimerInterval = setInterval(() => {
+        const now = new Date();
+        const diff = expiryDate - now;
+        
+        if (diff <= 0) {
+            clearInterval(inlineOtpTimerInterval);
+            display.textContent = 'انتهت صلاحية الرمز. يمكنك إعادة الإرسال.';
+            display.style.color = '#ff4757';
+            resendBtn.disabled = false;
+            resendBtn.style.cursor = 'pointer';
+            resendBtn.style.color = 'var(--brand)';
+            return;
+        }
+        
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        display.textContent = `الوقت المتبقي: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        display.style.color = '#ff9f43';
+    }, 1000);
+}
+
+async function resendInlineOtp() {
+    const resendBtn = document.getElementById('inlineResendOtpBtn');
+    const errorEl = document.getElementById('dcbOtpErrorText');
+    const transactionId = inlineDcbTransactionId;
+
+    resendBtn.disabled = true;
+    resendBtn.style.cursor = 'not-allowed';
+    resendBtn.style.color = 'var(--text-muted)';
+    
+    try {
+        const res = await window.DCBEngine.sendOTP(transactionId);
+        if (res.success) {
+            const settings = await window.DCBEngine.getSettings();
+            const expirySeconds = (settings && settings.otp_expiry_seconds) || 120;
+            const newExpiry = new Date(Date.now() + expirySeconds * 1000);
+            
+            errorEl.style.display = 'none';
+            startInlineOtpTimer(newExpiry);
+        } else {
+            resendBtn.disabled = false;
+            resendBtn.style.cursor = 'pointer';
+            resendBtn.style.color = 'var(--brand)';
+            errorEl.textContent = res.message;
+            errorEl.style.display = 'block';
+        }
+    } catch (err) {
+        console.error(err);
+        resendBtn.disabled = false;
+        resendBtn.style.cursor = 'pointer';
+        resendBtn.style.color = 'var(--brand)';
+    }
+}
+
+async function verifyInlineOtp() {
+    const code = document.getElementById('dcbOtpInput').value.trim();
+    const errorEl = document.getElementById('dcbOtpErrorText');
+    const transactionId = inlineDcbTransactionId;
+
+    if (!code || code.length < 6) {
+        errorEl.textContent = 'يرجى إدخال رمز التأكيد المكون من 6 أرقام.';
+        errorEl.style.display = 'block';
+        return;
+    }
+    errorEl.style.display = 'none';
+
+    updateSubmitButtonState('loading');
+
+    try {
+        const verifyRes = await window.DCBEngine.verifyOTP(transactionId, code);
+        if (verifyRes.verified) {
+            const chargeRes = await window.DCBEngine.chargePhone(transactionId);
+            if (chargeRes.success) {
+                await completeDcbDepositOrder(transactionId);
+            } else {
+                errorEl.textContent = chargeRes.message;
+                errorEl.style.display = 'block';
+                updateSubmitButtonState('verify');
+            }
+        } else {
+            errorEl.textContent = verifyRes.message;
+            errorEl.style.display = 'block';
+            updateSubmitButtonState('verify');
+            
+            if (verifyRes.attemptsRemaining === 0) {
+                clearInterval(inlineOtpTimerInterval);
+                setTimeout(() => {
+                    document.getElementById('inlineOtpPanel').style.display = 'none';
+                    document.getElementById('dcbPhone').disabled = false;
+                    document.querySelectorAll('.carrier-btn').forEach(btn => btn.style.pointerEvents = 'auto');
+                    updateSubmitButtonState('initiate');
+                }, 3000);
+            }
+        }
+    } catch (err) {
+        console.error(err);
+        errorEl.textContent = 'حدث خطأ أثناء معالجة كود OTP.';
+        errorEl.style.display = 'block';
+        updateSubmitButtonState('verify');
+    }
+}
+
+async function completeDcbDepositOrder(transactionId) {
+    const d = window._dcbOrderData;
+    const refCode = 'B2B-DEP-' + Date.now().toString(36).toUpperCase();
+    
+    const payload = buildOrderPayload({ ...d, refCode, status: 'deposit_paid' });
+    payload.payment_method = 'dcb';
+    payload.dcb_transaction_id = transactionId;
+
+    const supabase = window.getSupabaseClient?.();
+    if (!supabase) throw new Error('تعذر الاتصال بقاعدة البيانات');
+
+    const { error } = await supabase.from('orders').insert(payload);
+    if (error) throw error;
+
+    localStorage.setItem('kh_user_info', JSON.stringify({ name: d.name, phone: d.phone }));
+
+    await supabase.from('admin_notifications').insert({
+        type:       'new_order',
+        title:      `🧾 طلب جملة — عربون تم | ${product.name}`,
+        message:    `العميل: ${d.name} | ${d.phone} | الكمية: ${d.qty} | العربون: ${d.deposit.toLocaleString()} دج (عبر الهاتف)`,
+        user_email: d.phone,
+        priority:   'high',
+        created_at: new Date().toISOString()
+    });
+
+    window._lastOrderPhone = d.phone;
+    window._lastOrderProduct = product;
+    window._lastOrderQty = d.qty;
+    window._lastOrderTotal = d.total;
+    window._lastOrderDep = d.deposit;
+    window._lastOrderName = d.name;
+
+    document.getElementById('refCodeDeposit').textContent = refCode;
+    document.getElementById('successDepositOverlay').classList.add('show');
+}
+
+async function submitCodOrder(d) {
+    updateSubmitButtonState('loading');
+
+    const wa = product.merchant_whatsapp || product.merchant_phone || '';
+    const refCode = 'B2B-COD-' + Date.now().toString(36).toUpperCase();
+
+    try {
+        const supabase = window.getSupabaseClient?.();
+        if (supabase) {
+            const payload = buildOrderPayload({ ...d, refCode, status: 'pending_contact' });
+            payload.payment_method = 'cod';
+            const { error } = await supabase.from('orders').insert(payload);
+            if (error) console.warn('DB insert warning:', error.message);
+
+            await supabase.from('admin_notifications').insert({
+                type:       'new_order',
+                title:      `📲 طلب جملة — دفع عند الاستلام | ${product.name}`,
+                message:    `العميل: ${d.name} | ${d.phone} | الكمية: ${d.qty} | إجمالي: ${d.total.toLocaleString()} دج`,
+                user_email: d.phone,
+                priority:   'medium',
+                created_at: new Date().toISOString()
+            });
+        }
+    } catch (err) {
+        console.warn('تحذير: لم يُحفظ الطلب في قاعدة البيانات:', err.message);
+    }
+
+    let waPhone = wa.replace(/\D/g, '');
+    if (waPhone.startsWith('0')) waPhone = '213' + waPhone.slice(1);
+
+    const msg = encodeURIComponent(
+        `مرحباً، أنا ${d.name || 'عميل من كلش هنا B2B'}\n` +
+        `أود طلب المنتج: *${product.name}*\n` +
+        `الكمية: *${d.qty} قطعة*\n` +
+        `الإجمالي: *${d.total.toLocaleString()} دج* (الدفع عند الاستلام)\n` +
+        `الرقم المرجعي: ${refCode}\n\n` +
+        `أرجو التواصل لإتمام تفاصيل الشحن.`
+    );
+
+    document.getElementById('refCodeMerchant').textContent = refCode;
+    document.getElementById('successMerchantOverlay').classList.add('show');
+
+    if (waPhone) {
+        setTimeout(() => window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank'), 400);
+    }
+
+    updateSubmitButtonState('cod');
+}
+
+function openWhatsAppFromSuccess() {
+    const wa = (window._lastOrderProduct?.merchant_whatsapp || window._lastOrderProduct?.merchant_phone || '');
+    let waPhone = wa.replace(/\D/g, '');
+    if (waPhone.startsWith('0')) waPhone = '213' + waPhone.slice(1);
+    const name = window._lastOrderName || '';
+    const qty  = window._lastOrderQty  || MOQ;
+    const total = window._lastOrderTotal || 0;
+    const dep   = window._lastOrderDep  || 0;
+    const msg = encodeURIComponent(
+        `مرحباً، أنا ${name || 'عميل B2B'}\n` +
+        `قمت بتسجيل طلب عربون للمنتج: *${window._lastOrderProduct?.name}*\n` +
+        `الكمية: *${qty} قطعة*\n` +
+        `الإجمالي: *${total.toLocaleString()} دج* | العربون المدفوع: *${dep.toLocaleString()} دج*\n\n` +
+        `أرجو التواصل لإتمام تفاصيل الطلب.`
+    );
+    if (waPhone) window.open(`https://wa.me/${waPhone}?text=${msg}`, '_blank');
+    else alert('لا يوجد رقم واتساب للتاجر.');
+}
+</script>
+</body>
+</html>

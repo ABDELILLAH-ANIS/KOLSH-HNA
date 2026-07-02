@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="كلش هنا - دليل المتاجر الإلكترونية في الجزائر. تسوّق من أفضل المتاجر وتواصل مع التجار مباشرة." />
+  <meta name="keywords" content="تسوق اون لاين الجزائر, متاجر الكترونية, كلش هنا, سوق جزائري" />
+  <meta property="og:title" content="كلش هنا - دليل المتاجر" />
+  <meta property="og:description" content="اكتشف أفضل المتاجر الإلكترونية في الجزائر" />
+  <meta property="og:type" content="website" />
+  <!-- CSP -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com https://generativelanguage.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://generativelanguage.googleapis.com https://api.yalidine.app https://www.zr-express.dz; frame-src 'none'; object-src 'none';" />
+  <title>كلش هنا - دليل المتاجر</title>
+  <link href="https://fonts.googleapis.com/css2?family=Gumela&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/css_main.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/cart.css">
+  <script src="js/translations.js"></script>
+  <script src="js/performance.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+</head>
+<body>
+  <!-- التظليل الخلفي للنوافذ -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+  <!-- الهيدر الرئيسي -->
+  <header id="mainHeader">
+    <div class="header-left">
+      <div class="language-dropdown">
+        <button class="lang-btn" onclick="toggleLangMenu(event)" aria-label="LanguageMenu">
+          🌐
+        </button>
+        <ul id="languageMenu" class="lang-menu">
+          <li onclick="changeLanguage('ar')">🇩🇿 العربية</li>
+          <li onclick="changeLanguage('fr')">🇫🇷 Français</li>
+          <li onclick="changeLanguage('en')">🇺🇸 English</li>
+        </ul>
+      </div>
+      <button class="menu-button" onclick="toggleMenu(event)" aria-label="MainMenu">
+        ☰
+      </button>
+    </div>
+
+    <div class="header-center">
+      <img src="images/logo.png" alt="شعار كلش هنا" class="logo" />
+    </div>
+
+    <div class="header-right">
+      <video class="video" autoplay muted loop playsinline>
+        <source src="videos/promo.mp4" type="video/mp4">
+        متصفحك لا يدعم تشغيل الفيديو
+      </video>
+    </div>
+  </header>
+
+  <!-- شريط الإعلانات (مخفي افتراضياً، يظهر بعد تحميل DB) -->
+  <div id="announcementBar" class="announcement-bar" style="display:none;" role="alert" aria-live="assertive">
+    <span class="ann-icon">📢</span>
+    <span id="annBarText"></span>
+    <a id="annBarCta" href="#" class="ann-cta" style="display:none;"></a>
+    <button class="ann-close" onclick="this.parentElement.style.display='none'; document.body.classList.remove('has-announcement');" aria-label="إغلاق">×</button>
+  </div>
+
+  <!-- القائمة الجانبية -->
+  <nav id="mainMenu" class="menu" role="navigation" aria-label="القائمة الرئيسية">
+    <input type="text" class="search-box"
+           data-key="searchPlaceholder"
+           placeholder="🔍 ابحث عن متجر..."
+           id="searchBox" oninput="searchStores()" />
+
+    <a href="index.html" class="menu-item" data-key="home">🏠 الصفحة الرئيسية</a>
+    <a href="wholesale.html" class="menu-item" style="color: #00ffc3; font-weight: bold;"><i class="fa-solid fa-boxes-packing"></i> سوق الجملة B2B</a>
+    <a href="real-estate.html" class="menu-item" data-key="realEstate">🏠 العقارات</a>
+    <a href="package.html" class="menu-item" data-key="packages">💎 الباقات</a>
+    <a href="#" class="menu-item" data-key="contactUs" onclick="toggleContactModal(event)">📞 تواصل معنا</a>
+    <a href="aboutme.html" class="menu-item" data-key="aboutMe">👤 من أنا</a>
+    <a href="login.html" class="menu-item" data-key="login">🔐 تسجيل الدخول</a>
+    <a href="#" class="menu-item" id="sidebarDarkModeToggle" onclick="window.DarkMode.toggle(); event.preventDefault();">
+      <i class="fa-solid fa-moon"></i> <span data-key="themeToggleDark">الوضع الداكن</span>
+    </a>
+  </nav>
+
+  <!-- VIP Hero Ad Carousel -->
+  <section id="heroCarousel" class="hero-carousel" aria-label="vip ads" style="display:none;">
+    <div class="carousel-track" id="carouselTrack">
+      <!-- Skeleton while loading -->
+      <div class="carousel-slide carousel-skeleton" style="opacity:1;">
+        <div class="skeleton-shimmer"></div>
+      </div>
+    </div>
+    <div class="carousel-nav">
+      <button class="carousel-btn prev" id="carouselPrev" aria-label="السابق">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+      <div class="carousel-dots" id="carouselDots"></div>
+      <button class="carousel-btn next" id="carouselNext" aria-label="التالي">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+    </div>
+    <div class="carousel-timer-bar">
+      <div class="carousel-timer-fill" id="carouselTimerFill"></div>
+    </div>
+  </section>
+
+  <!-- الخط الفاصل -->
+  <hr class="divider" />
+
+  <!-- معرض إعلانات VIP المتمدد (hover to expand) -->
+  <section class="vip-gallery-section" id="vipGallerySection" style="display:none;" aria-label="إعلانات المتاجر VIP">
+    <h2 class="vip-title" data-key="VIP ads"> VIP ads </h2>
+    <div id="vipGallery" class="expanding-gallery"></div>
+  </section>
+
+  <!-- المحتوى الرئيسي -->
+  <main class="main-layout" id="mainContent">
+    <!-- منطقة المتاجر -->
+    <div class="content-wrapper">
+      <div class="stores-area">
+        <!-- رسالة التحميل -->
+        <div id="loadingMessage" class="loading">جاري تحميل المتاجر...</div>
+
+        <!-- شبكة المتاجر -->
+        <div id="storesContainer" class="store-grid" aria-live="polite"></div>
+
+        <!-- التحكم بالصفحات -->
+        <div class="pagination-controls">
+          <button id="prevPage" class="page-btn" onclick="changePage(-1)" data-key="previous">← السابق</button>
+          <span id="pageIndicator" class="page-info">صفحة 1 من 1</span>
+          <button id="nextPage" class="page-btn" onclick="changePage(1)" data-key="next">التالي →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- قسم العقارات (يظهر إذا كانت هناك قوائم) -->
+    <section id="realEstateSection" class="real-estate-section" style="display:none;" aria-label="قسم العقارات">
+      <div class="re-header">
+        <h2 class="re-title" data-key="realEstateTitle">عقارات للبيع والإيجار</h2>
+        <a href="real-estate.html" class="re-view-all" data-key="viewAll">عرض الكل ←</a>
+      </div>
+      <div id="realEstateGrid" class="re-grid"></div>
+    </section>
+  </main>
+
+  <!-- placeholder لزر السلة العائم (يُحقن من cart.js) -->
+  <div id="floatingCartPlaceholder" aria-live="polite"></div>
+
+  <!-- الفوتر -->
+  <footer>
+    <div class="footer-row">
+      <div class="footer-links">
+        <a href="#" onclick="toggleContactModal(event)" data-key="footerContact">📞 تواصل معنا</a>
+        <a href="aboutme.html" data-key="footerAbout">ℹ️ عن الموقع</a>
+        <a href="privacy.html" data-key="footerPrivacy">🔒 سياسة الخصوصية</a>
+        <a href="terms.html" data-key="footerTerms">📋 الشروط والأحكام</a>
+      </div>
+      <div class="footer-brand">
+        <span data-key="footerRights">جميع الحقوق محفوظة © كلش هنا 2025</span>
+        <img src="images/moanislogo.png" alt="شعار مؤنس" class="footer-logo" />
+      </div>
+    </div>
+    <div class="footer-row" style="justify-content: center;">
+      <div class="social-icons">
+        <!-- تبقى أيقونات السوشيال ميديا كما هي -->
+      </div>
+    </div>
+  </footer>
+
+  <!-- نافذة التواصل -->
+  <div id="contactModal" class="contact-modal" role="dialog" aria-modal="true" aria-label="معلومات التواصل">
+    <h3 data-key="contactTitle">📞 معلومات التواصل</h3>
+    <div class="contact-info">
+      <p>
+        <strong data-key="contactEmail">📧 البريد الإلكتروني:</strong>
+        info@kolchhona.com
+      </p>
+      <p>
+        <strong data-key="contactPhone">📞 الهاتف:</strong>
+        +213 000 000 000
+      </p>
+      <p>
+        <strong data-key="contactHours">🕒 أوقات العمل:</strong>
+        9:00 ص - 5:00 م
+      </p>
+    </div>
+    <button onclick="toggleContactModal(event)" class="close-modal-btn" data-key="close">
+      إغلاق
+    </button>
+  </div>
+
+  <!-- Scripts (ordered by dependency) -->
+  <script src="js/security.js" defer></script>
+  <script src="js/themes-engine.js" defer></script>
+  <script src="js/analytics.js" defer></script>
+  <script src="js/js_main.js" defer></script>
+  <script src="js/cart.js" defer></script>
+  <script src="js/dark-mode.js" defer></script>
+  <script src="js/ia-agent.js" defer></script>
+  <script src="js/reviews.js" defer></script>
+
+  <script>
+  // Initialize V4 features on load
+  window.addEventListener('load', function() {
+    console.log('=====================');
+    console.log('✅ كلش هنا V4 محملة');
+    console.log('🔐 Security:', typeof window.KH_Security !== 'undefined' ? 'جاهز' : 'غير موجود');
+    console.log('🌍 Translations:', window.translationManager ? 'جاهز' : 'غير موجود');
+    console.log('=====================');
+
+    // Apply event theme
+    if (window.KH_ThemesEngine) {
+      KH_ThemesEngine.loadActiveTheme().catch(()=>{});
+    }
+  });
+  </script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تسجيل الدخول</title>
+  <link rel="stylesheet" href="css/login.css">
+  <link href="https://fonts.googleapis.com/css2?family=Gumela&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+</head>
+
+<body>
+  <div class="language">
+    <button onclick="toggleLangMenu()">🌐</button>
+    <ul class="lang-menu" id="languageMenu">
+      <li onclick="setLanguage('ar')">🇩🇿 العربية</li>
+      <li onclick="setLanguage('fr')">🇫🇷 Français</li>
+      <li onclick="setLanguage('en')">🇺🇸 English</li>
+    </ul>
+  </div>
+
+  <div class="auth-box" id="loginBox">
+    <div class="welcome" data-key="welcome">مرحبًا بك في متجرك</div>
+    <h2 data-key="login_heading">تسجيل الدخول</h2>
+
+    <div class="form-group">
+      <label for="email" data-key="email">البريد الإلكتروني أو رقم الهاتف</label>
+      <input type="text" id="email" dir="ltr" placeholder="مثال: +213600000000 أو بريد@مثال.com" />
+    </div>
+
+    <div class="form-group">
+      <label for="password" data-key="password">كلمة المرور</label>
+      <input type="password" id="password" />
+    </div>
+
+    <button id="loginBtn" data-key="login_button">دخول</button>
+
+    <div class="or-divider">
+      <span data-key="or">أو</span>
+    </div>
+
+    <button id="googleLoginBtn" class="google-login-btn">
+      <svg width="22" height="22" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      تسجيل الدخول باستخدام Google
+    </button>
+
+    <div class="error-message" id="errorMessage"></div>
+    <div class="success-message" id="successMessage"></div>
+
+    <div class="action-links">
+      <button id="createAccountBtn" data-key="create_account">إنشاء حساب جديد</button>
+      <button id="forgotPasswordBtn" data-key="forgot_password">نسيت كلمة المرور؟</button>
+    </div>
+
+    <button id="backButton" data-key="back">⬅ رجوع</button>
+  </div>
+
+  <!-- نافذة نسيت كلمة المرور -->
+  <div class="auth-box" id="forgotPasswordBox" style="display: none;">
+    <h2 data-key="reset_password_title">إعادة تعيين كلمة المرور</h2>
+
+    <div class="form-group">
+      <label for="reset-email" data-key="email">البريد الإلكتروني</label>
+      <input type="email" id="reset-email" />
+    </div>
+
+    <button id="sendResetBtn" data-key="send_reset_link">إرسال رابط التعيين</button>
+
+    <div class="error-message" id="resetErrorMessage"></div>
+    <div class="success-message" id="resetSuccessMessage"></div>
+
+    <button id="backToLoginBtn" data-key="back_to_login">رجوع لتسجيل الدخول</button>
+  </div>
+
+
+
+  <script src="js/auth.js"></script>
+  <script src="js/login-config.js"></script>
+  <script src="js/login.js"></script>
+</body>
+
+</html>

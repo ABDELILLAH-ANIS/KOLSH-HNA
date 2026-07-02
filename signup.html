@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">تسجيل حساب جديد - كلش هنا</title>
+    <link href="https://fonts.googleapis.com/css2?family=Gumela&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="css/package.css">
+    <link rel="stylesheet" href="css/signup.css">
+    <link rel="stylesheet" href="css/rtl.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/translations.js"></script>
+    <style>
+        /* ===== تصميم جديد للصفحة ===== */
+
+        /* زر الرجوع */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(0,255,195,0.3);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Gumela', sans-serif;
+            font-size: 14px;
+            z-index: 100;
+        }
+        .back-btn:hover { background: rgba(0,255,195,0.15); transform: scale(1.05); }
+
+        /* مبدل اللغة */
+        .lang-switcher {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 8px;
+        }
+        .lang-btn {
+            padding: 7px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(0,255,195,0.3);
+            background: rgba(255,255,255,0.07);
+            color: white;
+            font-family: 'Gumela', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .lang-btn:hover { background: rgba(0,255,195,0.15); border-color: var(--neon-green); }
+
+        /* حاوية الصفحة */
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            gap: 10px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        /* اتجاه سهم الرجوع وتنسيقه حسب اللغة */
+        .back-nav-btn i {
+            transition: transform 0.3s;
+        }
+        html[dir="rtl"] .back-nav-btn i {
+            margin-left: 8px;
+            transform: scaleX(1);
+        }
+        html[dir="ltr"] .back-nav-btn i {
+            margin-right: 8px;
+            transform: scaleX(-1);
+        }
+
+        /* تنسيق قائمة اللغة المنسدلة لتفادي الخروج عن الشاشة */
+        .language-dropdown .lang-menu {
+            left: 0 !important;
+            right: auto !important;
+        }
+        html[dir="ltr"] .language-dropdown .lang-menu {
+            left: auto !important;
+            right: 0 !important;
+        }
+
+
+        /* البطاقة الرئيسية */
+        .signup-card {
+            background: rgba(30, 30, 40, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0,255,195,0.18);
+            border-radius: 24px;
+            padding: 40px 36px;
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 40px rgba(0,255,195,0.05);
+            animation: fadeInUp 0.5s ease;
+        }
+        .signup-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            background: radial-gradient(600px circle at 50% -30%, rgba(0,255,195,0.08), transparent 70%);
+            pointer-events: none;
+        }
+
+        /* رأس الصفحة */
+        .card-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .card-logo {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        .card-title {
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 0 6px;
+        }
+        .card-subtitle {
+            color: rgba(255,255,255,0.45);
+            font-size: 13px;
+        }
+
+        /* معلومات الباقة */
+        .plan-badge {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0,255,195,0.08);
+            border: 1px solid rgba(0,255,195,0.25);
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin-bottom: 26px;
+        }
+        .plan-badge-name { color: var(--neon-green); font-weight: bold; font-size: 15px; }
+        .plan-badge-price { color: #fff; font-size: 18px; font-weight: bold; }
+        .plan-badge-period { color: rgba(255,255,255,0.45); font-size: 12px; text-align: left; }
+
+        /* ===== زر Google ===== */
+        .google-signup-btn {
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: #fff;
+            color: #3c4043;
+            font-family: 'Gumela', sans-serif;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .google-signup-btn:hover {
+            background: #f8f8f8;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        .google-signup-btn:active { transform: translateY(0); }
+        .google-signup-btn svg { flex-shrink: 0; }
+        .google-signup-btn .g-text { color: #3c4043; }
+
+        /* ===== فاصل أو ===== */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin: 22px 0;
+        }
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+        }
+        .divider-text {
+            color: rgba(255,255,255,0.35);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        /* ===== نموذج الإيميل ===== */
+        .email-form-section { }
+
+        .form-group {
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .form-label {
+            display: block;
+            margin-bottom: 7px;
+            color: rgba(255,255,255,0.6);
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .form-input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: white;
+            font-family: 'Gumela', sans-serif;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(0,255,195,0.5);
+            background: rgba(0,255,195,0.05);
+            box-shadow: 0 0 0 3px rgba(0,255,195,0.08);
+        }
+        .form-input::placeholder { color: rgba(255,255,255,0.2); }
+
+        .phone-input-group { display: flex; gap: 10px; }
+        .country-code { width: 75px; text-align: center; flex-shrink: 0; }
+        .phone-number { flex: 1; }
+
+        /* زر إنشاء الحساب */
+        .create-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #00ffc3, #00d4a1);
+            border: none;
+            border-radius: 14px;
+            color: #0a0a0a;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Gumela', sans-serif;
+            margin-top: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        .create-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .create-btn:hover::before { opacity: 1; }
+        .create-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,255,195,0.3); }
+        .create-btn:active { transform: translateY(0); }
+        .create-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* رابط تسجيل الدخول */
+        .login-link {
+            text-align: center;
+            margin-top: 22px;
+            color: rgba(255,255,255,0.4);
+            font-size: 13px;
+        }
+        .login-link a { color: var(--neon-green); text-decoration: none; }
+        .login-link a:hover { text-decoration: underline; }
+
+        /* إشعار الدفع */
+        .payment-notice {
+            background: rgba(255,165,0,0.08);
+            border: 1px solid rgba(255,165,0,0.35);
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin: 18px 0;
+            font-size: 13px;
+        }
+        .payment-notice-title {
+            color: #ffa500;
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .payment-notice p {
+            color: rgba(255,255,255,0.5);
+            margin: 5px 0;
+            font-size: 12px;
+        }
+
+        /* الإشعارات */
+        .notification {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 280px;
+            max-width: 420px;
+            padding: 14px 20px;
+            border-radius: 14px;
+            z-index: 9999;
+            white-space: pre-line;
+            line-height: 1.6;
+            font-size: 14px;
+            animation: slideDown 0.4s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+        .notification.success {
+            background: rgba(0,255,195,0.95);
+            color: #000;
+            border: 1px solid #00ffc3;
+        }
+        .notification.error {
+            background: rgba(255,60,60,0.95);
+            color: #fff;
+            border: 1px solid rgba(255,100,100,0.5);
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        /* الحركات */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* حالة التحميل */
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(0,0,0,0.3);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-left: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* مساعد كلمة المرور */
+        .password-strength {
+            display: flex;
+            gap: 4px;
+            margin-top: 7px;
+        }
+        .strength-bar {
+            flex: 1;
+            height: 3px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.1);
+            transition: background 0.3s;
+        }
+        .strength-bar.weak { background: #ff4757; }
+        .strength-bar.medium { background: #ffa502; }
+        .strength-bar.strong { background: #00ffc3; }
+
+        /* ===== اختيار نوع الحساب ===== */
+        .role-selector-label {
+            color: rgba(255,255,255,0.55);
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .role-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+        .role-card {
+            border: 1.5px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 14px 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: rgba(255,255,255,0.03);
+            position: relative;
+            user-select: none;
+        }
+        .role-card:hover {
+            border-color: rgba(0,255,195,0.4);
+            background: rgba(0,255,195,0.05);
+            transform: translateY(-2px);
+        }
+        .role-card.selected {
+            border-color: var(--neon-green);
+            background: rgba(0,255,195,0.12);
+            box-shadow: 0 0 0 3px rgba(0,255,195,0.12);
+        }
+        .role-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 6px;
+            left: 8px;
+            color: var(--neon-green);
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .role-card-icon { font-size: 22px; margin-bottom: 6px; }
+        .role-card-name {
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 3px;
+            line-height: 1.3;
+        }
+        .role-card-desc {
+            color: rgba(255,255,255,0.35);
+            font-size: 10px;
+            line-height: 1.4;
+        }
+        .role-card.selected .role-card-name { color: var(--neon-green); }
+
+        .broker-note {
+            display: none;
+            background: rgba(147,112,219,0.1);
+            border: 1px solid rgba(147,112,219,0.35);
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: rgba(200,180,255,0.85);
+            line-height: 1.5;
+        }
+        .broker-note.show { display: block; }
+
+        @media (max-width: 500px) {
+            .signup-card { padding: 28px 20px; border-radius: 18px; }
+            .card-title { font-size: 20px; }
+            .role-cards { grid-template-columns: repeat(2, 1fr); gap: 7px; }
+            .role-card { padding: 11px 5px; }
+            .role-card-icon { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- إشعار -->
+    <div id="notification" class="notification"></div>
+
+    <!-- محتوى الصفحة -->
+    <div class="page-wrapper">
+        <div class="top-nav-container" style="width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; box-sizing: border-box; padding: 0 5px;">
+            <!-- زر العودة -->
+            <button class="nav-icon-btn back-nav-btn" onclick="goBack('package.html')" style="font-family: 'Gumela', sans-serif; font-size: 14px; padding: 10px 18px; border-radius: 12px; background: rgba(255,255,255,0.07); border: 1px solid rgba(0,255,195,0.3); color: white; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-chevron-right"></i> <span id="backBtn" data-key="back">الرجوع</span>
+            </button>
+            
+            <!-- زر تبديل اللغة المنسدل -->
+            <div class="language-dropdown" style="position: relative;">
+                <button class="nav-icon-btn" onclick="toggleLangMenu(event)" id="langBtn" style="font-size: 16px; padding: 10px 15px; border-radius: 12px; background: rgba(255,255,255,0.07); border: 1px solid rgba(0,255,195,0.3); color: white; cursor: pointer; transition: 0.3s;" title="اللغة">
+                    <i class="fas fa-globe"></i>
+                </button>
+                <ul id="languageMenu" class="lang-menu" style="display: none; position: absolute; top: 100%; left: 0; background: rgba(30, 30, 40, 0.95); border: 1px solid rgba(0, 255, 195, 0.3); border-radius: 12px; list-style: none; padding: 8px 0; margin: 8px 0 0 0; min-width: 120px; z-index: 1005; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                    <li onclick="switchLanguage('ar')" style="padding: 8px 16px; cursor: pointer; color: white; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,255,195,0.1)'" onmouseout="this.style.background='transparent'">🇩🇿 العربية</li>
+                    <li onclick="switchLanguage('fr')" style="padding: 8px 16px; cursor: pointer; color: white; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,255,195,0.1)'" onmouseout="this.style.background='transparent'">🇫🇷 Français</li>
+                    <li onclick="switchLanguage('en')" style="padding: 8px 16px; cursor: pointer; color: white; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,255,195,0.1)'" onmouseout="this.style.background='transparent'">🇺🇸 English</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="signup-card">
+
+            <!-- رأس الصفحة -->
+            <div class="card-header">
+                <div class="card-logo">🏪</div>
+                <h1 class="card-title" id="signupTitle">إنشاء حسابك</h1>
+                <p class="card-subtitle" id="signupSubtitle">أنشئ متجرك الإلكتروني في دقائق</p>
+            </div>
+
+            <!-- معلومات الباقة -->
+            <div class="plan-badge" id="planInfo">
+                <div>
+                    <div class="plan-badge-name" id="selectedPlanName">جارٍ التحميل...</div>
+                    <div class="plan-badge-period" id="selectedPlanPeriod">-</div>
+                </div>
+                <div class="plan-badge-price" id="selectedPlanPrice">-</div>
+            </div>
+
+            <!-- ===== اختيار نوع الحساب ===== -->
+            <span class="role-selector-label" id="roleSelectorLabel">نوع الحساب</span>
+            <div class="role-cards" id="roleCards">
+                <!-- تاجر تجزئة -->
+                <div class="role-card selected" data-role="retailer" onclick="selectRole('retailer')">
+                    <div class="role-card-icon">🏪</div>
+                    <div class="role-card-name" id="roleRetailerName">تاجر تجزئة</div>
+                    <div class="role-card-desc" id="roleRetailerDesc">افتح متجرك وبيع مباشرة للزبائن</div>
+                </div>
+                <!-- تاجر جملة -->
+                <div class="role-card" data-role="wholesaler" onclick="selectRole('wholesaler')">
+                    <div class="role-card-icon">🏭</div>
+                    <div class="role-card-name" id="roleWholesalerName">تاجر جملة</div>
+                    <div class="role-card-desc" id="roleWholesalerDesc">وزع منتجاتك على التجار</div>
+                </div>
+                <!-- مورد / مستورد -->
+                <div class="role-card" data-role="supplier" onclick="selectRole('supplier')">
+                    <div class="role-card-icon">🚢</div>
+                    <div class="role-card-name" id="roleSupplierName">مستورد / مصنع</div>
+                    <div class="role-card-desc" id="roleSupplierDesc">مورد جملة للمنصة والتجار</div>
+                </div>
+                <!-- مسوق/سمسار -->
+                <div class="role-card" data-role="broker" onclick="selectRole('broker')">
+                    <div class="role-card-icon">🔗</div>
+                    <div class="role-card-name" id="roleBrokerName">مسوق</div>
+                    <div class="role-card-desc" id="roleBrokerDesc">روّج وابدأ تكسب بدون رأس مال</div>
+                </div>
+            </div>
+            <!-- ملاحظة المسوق -->
+            <div class="broker-note" id="brokerNote">
+                🎉 <strong>المسوق لا يحتاج رأس مال!</strong><br>
+                تسجل مجاناً، تحصل على رابط خاص لكل منتج، وكل بيعة تكسب منها نقاط قابلة للسحب.
+                الباقة الحالية تُحتسب فقط إذا أردت لوحة تحكم متقدمة.
+            </div>
+
+            <!-- ===== زر Google ===== -->
+            <button type="button" class="google-signup-btn" id="googleSignupBtn">
+                <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                <span class="g-text" id="googleSignupText">التسجيل بحساب Google</span>
+            </button>
+
+            <!-- فاصل أو -->
+            <div class="divider">
+                <div class="divider-line"></div>
+                <span class="divider-text" id="orDivider">أو التسجيل بالبريد الإلكتروني</span>
+                <div class="divider-line"></div>
+            </div>
+
+            <!-- ===== نموذج البريد الإلكتروني ===== -->
+            <div class="email-form-section">
+                <form id="signupForm">
+                    <!-- الاسم الكامل -->
+                    <div class="form-group">
+                        <label class="form-label" for="fullName" id="fullNameLabel">الاسم الكامل</label>
+                        <input type="text" id="fullName" class="form-input" placeholder="أدخل اسمك الكامل" required autocomplete="name">
+                    </div>
+
+                    <!-- البريد الإلكتروني -->
+                    <div class="form-group">
+                        <label class="form-label" for="email" id="emailLabel">البريد الإلكتروني</label>
+                        <input type="email" id="email" class="form-input" placeholder="example@gmail.com" required autocomplete="email" dir="ltr">
+                    </div>
+
+                    <!-- كلمة المرور -->
+                    <div class="form-group">
+                        <label class="form-label" for="password" id="passwordLabel">كلمة المرور</label>
+                        <input type="password" id="password" class="form-input" placeholder="6 أحرف على الأقل" required minlength="6" autocomplete="new-password">
+                        <div class="password-strength" id="passwordStrength">
+                            <div class="strength-bar" id="bar1"></div>
+                            <div class="strength-bar" id="bar2"></div>
+                            <div class="strength-bar" id="bar3"></div>
+                        </div>
+                    </div>
+
+                    <!-- تأكيد كلمة المرور -->
+                    <div class="form-group">
+                        <label class="form-label" for="confirmPassword" id="confirmPasswordLabel">تأكيد كلمة المرور</label>
+                        <input type="password" id="confirmPassword" class="form-input" placeholder="أعد إدخال كلمة المرور" required autocomplete="new-password">
+                    </div>
+
+                    <!-- رقم الهاتف -->
+                    <div class="form-group">
+                        <label class="form-label" for="phone" id="phoneLabel">رقم الهاتف</label>
+                        <div class="phone-input-group">
+                            <input type="text" id="countryCode" class="form-input country-code" value="+213" readonly>
+                            <input type="tel" id="phone" class="form-input phone-number" placeholder="555123456" required>
+                        </div>
+                    </div>
+
+                    <!-- زر إنشاء الحساب -->
+                    <button type="submit" class="create-btn" id="signupBtn">
+                        إنشاء الحساب
+                    </button>
+                </form>
+            </div>
+
+            <!-- رابط تسجيل الدخول -->
+            <div class="login-link" id="loginLink">
+                لديك حساب بالفعل؟ <a href="login.html">سجل الدخول هنا</a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ملفات JavaScript -->
+    <script src="js/translations-signup.js"></script>
+    <script src="js/signup.js"></script>
+    <script>
+        // ===== اختيار نوع الحساب =====
+        let selectedRole = 'retailer';
+
+        function selectRole(role) {
+            selectedRole = role;
+            // تحديث التصميم البصري
+            document.querySelectorAll('.role-card').forEach(card => {
+                card.classList.toggle('selected', card.dataset.role === role);
+            });
+            // ملاحظة المسوق
+            const note = document.getElementById('brokerNote');
+            if (note) note.classList.toggle('show', role === 'broker');
+            // حفظ الاختيار
+            localStorage.setItem('selectedRole', role);
+            // تحديث أيقونة رأس الصفحة
+            const icons = { retailer: '🏪', wholesaler: '🏭', supplier: '🚢', broker: '🔗' };
+            const logoEl = document.querySelector('.card-logo');
+            if (logoEl) logoEl.textContent = icons[role] || '🏪';
+        }
+
+        // استرجاع الدور المحفوظ (إن وجد)
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedRole = localStorage.getItem('selectedRole');
+            if (savedRole && ['retailer','wholesaler','supplier','broker'].includes(savedRole)) {
+                selectRole(savedRole);
+            }
+        });
+
+        // جعل الدالة متاحة عالمياً
+        window.selectRole = selectRole;
+        window.getSelectedRole = () => selectedRole;
+    </script>
+
+    <script>
+        // ===== مؤشر قوة كلمة المرور =====
+        document.getElementById('password').addEventListener('input', function() {
+            const val = this.value;
+            const bars = [
+                document.getElementById('bar1'),
+                document.getElementById('bar2'),
+                document.getElementById('bar3')
+            ];
+            bars.forEach(b => b.className = 'strength-bar');
+
+            if (val.length === 0) return;
+
+            let strength = 0;
+            if (val.length >= 6) strength++;
+            if (/[A-Z]/.test(val) || /[0-9]/.test(val)) strength++;
+            if (val.length >= 10 && /[^A-Za-z0-9]/.test(val)) strength++;
+
+            const classes = ['weak', 'medium', 'strong'];
+            for (let i = 0; i < strength; i++) {
+                bars[i].classList.add(classes[strength - 1]);
+            }
+        });
+
+        // ===== التحقق من تطابق كلمة المرور =====
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            if (this.value && password !== this.value) {
+                this.style.borderColor = '#ff4757';
+            } else if (this.value) {
+                this.style.borderColor = 'rgba(0,255,195,0.5)';
+            } else {
+                this.style.borderColor = 'rgba(255,255,255,0.1)';
+            }
+        });
+
+        // ===== الترجمات والتحكم =====
+        function toggleLangMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('languageMenu');
+            if (menu) {
+                menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        document.addEventListener('click', function() {
+            const menu = document.getElementById('languageMenu');
+            if (menu) menu.style.display = 'none';
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof setPageDirection === 'function') setPageDirection();
+            if (typeof applyTranslations === 'function') applyTranslations();
+        });
+
+        function applyTranslations() {
+            if (typeof translate !== 'function') return;
+            const safe = (id, key) => {
+                const el = document.getElementById(id);
+                const t = translate(key);
+                if (el && t) el.textContent = t;
+            };
+            safe('pageTitle', 'title');
+            safe('signupTitle', 'signup_title');
+            safe('signupSubtitle', 'signup_subtitle');
+            safe('backBtn', 'back');
+            safe('fullNameLabel', 'full_name');
+            safe('emailLabel', 'email');
+            safe('passwordLabel', 'password');
+            safe('confirmPasswordLabel', 'confirm_password');
+            safe('phoneLabel', 'phone');
+            safe('signupBtn', 'create_account');
+            safe('googleSignupText', 'google_signup');
+            safe('orDivider', 'or_divider');
+
+            const placeholders = {
+                fullName: 'full_name_placeholder',
+                email: 'email_placeholder',
+                password: 'password_placeholder',
+                confirmPassword: 'confirm_password_placeholder',
+                phone: 'phone_placeholder'
+            };
+            Object.entries(placeholders).forEach(([id, key]) => {
+                const el = document.getElementById(id);
+                const t = translate(key);
+                if (el && t) el.placeholder = t;
+            });
+
+            const loginLinkEl = document.getElementById('loginLink');
+            const loginT = translate('login_link');
+            if (loginLinkEl && loginT) loginLinkEl.innerHTML = loginT;
+
+            safe('roleSelectorLabel', 'role_selector_label');
+            safe('roleRetailerName', 'role_retailer_name');
+            safe('roleRetailerDesc', 'role_retailer_desc');
+            safe('roleWholesalerName', 'role_wholesaler_name');
+            safe('roleWholesalerDesc', 'role_wholesaler_desc');
+            safe('roleSupplierName', 'role_supplier_name');
+            safe('roleSupplierDesc', 'role_supplier_desc');
+            safe('roleBrokerName', 'role_broker_name');
+            safe('roleBrokerDesc', 'role_broker_desc');
+
+            const brokerNoteEl = document.getElementById('brokerNote');
+            const brokerT = translate('broker_note_text');
+            if (brokerNoteEl && brokerT) brokerNoteEl.innerHTML = brokerT;
+
+            const planNameEl = document.getElementById('selectedPlanName');
+            if (planNameEl && typeof loadSelectedPlan === 'function') {
+                loadSelectedPlan();
+            }
+        }
+
+        function switchLanguage(lang) {
+            localStorage.setItem('appLanguage', lang);
+            localStorage.setItem('lang', lang);
+            localStorage.setItem('packageLang', lang);
+            location.reload();
+        }
+
+        window.switchLanguage = switchLanguage;
+        window.applyTranslations = applyTranslations;
+    </script>
+</body>
+</html>

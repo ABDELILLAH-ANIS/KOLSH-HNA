@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>كلش هنا B2B — منصة الجملة المعتمدة</title>
+    <meta name="description" content="تسوق بالجملة مباشرة من التجار المعتمدين في الجزائر. أسعار مصنع، شحن آمن، دفع عربون."/>
+
+    <!-- Tailwind (utility helpers) -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;900&family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+    <!-- Page stylesheet -->
+    <link rel="stylesheet" href="css/wholesale.css"/>
+
+    <script>
+        /* Tailwind kept only for responsive grid helpers */
+        tailwind.config = { corePlugins: { preflight: false } };
+    </script>
+</head>
+
+<body class="dot-pattern flex flex-col min-h-screen">
+
+<!-- ═══════════════════════════════════════════════════════
+     ANNOUNCEMENT BAR  (populated by JS from admin_announcements)
+═══════════════════════════════════════════════════════ -->
+<div class="ann-bar" id="annBar" style="display:none;">
+    <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;margin-left:4px;">campaign</span>
+    <span id="annBarText"></span>
+    <button class="ann-close" onclick="document.getElementById('annBar').style.display='none'">✕</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════════════════ -->
+<header class="site-header" id="siteHeader">
+    <div class="header-inner">
+
+        <!-- Logo -->
+        <a href="index.html" class="site-logo">
+            <img src="images/8ff734c4-bd08-4561-b901-66de057fb3fc_removalai_preview.png" alt="كلش هنا B2B"/>
+        </a>
+
+        <!-- Desktop Nav -->
+        <nav class="nav-links" id="mainNav">
+            <a href="wholesale.html" class="nav-link active">السوق</a>
+            <a href="#categoriesBar" class="nav-link">التصنيفات</a>
+
+            <!-- Merchants Dropdown -->
+            <div class="nav-dropdown" id="merchantsDropdownWrap">
+                <button class="nav-link nav-dropdown-trigger" onclick="toggleMerchantsDropdown()" id="merchantsDropBtn">
+                    التجار
+                    <span class="material-symbols-outlined" style="font-size:14px;vertical-align:middle;" id="merchantsChevron">expand_more</span>
+                </button>
+                <div class="nav-dropdown-menu" id="merchantsDropdownMenu">
+                    <div class="dropdown-header">متاجر الجملة المعتمدة</div>
+                    <div id="merchantsDropdownList">
+                        <div class="dropdown-loading">
+                            <i class="fas fa-spinner fa-spin"></i> جاري التحميل...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <a href="index.html" class="nav-link">الرئيسية</a>
+        </nav>
+
+        <!-- Search bar -->
+        <div class="search-wrap">
+            <input id="searchInput" type="text" placeholder="ابحث في منتجات الجملة..." oninput="filterProducts()"/>
+            <span class="material-symbols-outlined search-icon">search</span>
+        </div>
+
+        <!-- Right actions -->
+        <div class="header-actions">
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn" title="تبديل المظهر">
+                <span class="material-symbols-outlined tt-icon" id="themeIcon">light_mode</span>
+                <span class="tt-label" id="themeLabel">فاتح</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     MAIN CONTENT
+═══════════════════════════════════════════════════════ -->
+<main style="flex:1; max-width:1600px; margin:0 auto; width:100%; padding:24px 20px; display:flex; flex-direction:column; gap:24px;">
+
+    <!-- ── HERO + ADS ROW ── -->
+    <section class="hero-row-grid">
+
+        <!-- HERO -->
+        <div class="hero-section">
+            <div class="hero-dots"></div>
+            <div class="hero-glow-1"></div>
+            <div class="hero-glow-2"></div>
+
+            <div class="hero-content">
+                <!-- Live badge -->
+                <div class="hero-live-badge">
+                    <span class="live-dot"></span>
+                    حدث توريد مباشر • جملة معتمدة
+                </div>
+
+                <h1 class="hero-title">
+                    تسوق مباشرة من<br/>
+                    <span class="accent">تجار الجملة المعتمدين</span><br/>
+                    مع ضمان عربون التأكيد
+                </h1>
+
+                <p class="hero-desc">
+                    وصول مباشر للمستوردين والموردين المعتمدين. اطلب بالجملة، ادفع عربوناً (20%) لتأكيد حجزك وضمان الشحن الآمن.
+                </p>
+
+                <div class="hero-buttons">
+                    <button class="hero-btn-hero" onclick="scrollToProducts()">
+                        استعراض العروض
+                        <span class="material-symbols-outlined" style="font-size:18px;">keyboard_arrow_down</span>
+                    </button>
+                    <a href="dashboard.html" class="hero-btn-ghost">
+                        <span class="material-symbols-outlined" style="font-size:15px;">add_business</span>
+                        سجّل كمورد
+                    </a>
+                </div>
+
+                <!-- Stats -->
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="val" id="statSuppliers">0+</div>
+                        <div class="lbl">مورد معتمد</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="val" id="statProducts">0+</div>
+                        <div class="lbl">منتج جملة</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="val gold">100%</div>
+                        <div class="lbl">موثّق ومعتمد</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle Column: Two Stacked Fixed Ads -->
+        <div class="hero-ads-middle">
+            <div class="fixed-ad-card" id="adWholesaleMidTop">
+                <div class="ad-card-placeholder">إعلان ممول</div>
+            </div>
+            <div class="fixed-ad-card" id="adWholesaleMidBottom">
+                <div class="ad-card-placeholder">إعلان ممول</div>
+            </div>
+        </div>
+
+        <!-- Left Column: One Fixed Ad -->
+        <div class="hero-ads-left">
+            <div class="fixed-ad-card tall" id="adWholesaleLeft">
+                <div class="ad-card-placeholder">إعلان ممول</div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ── CATEGORIES ── -->
+    <section id="categoriesBar">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <h2 style="font-size:15px;font-weight:800;display:flex;align-items:center;gap:6px;">
+                <span class="material-symbols-outlined" style="font-size:18px;color:var(--brand);">category</span>
+                التصنيفات
+            </h2>
+            <a href="wholesale-all.html"
+               style="font-size:11px;color:var(--brand);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;">
+                عرض الكل
+                <span class="material-symbols-outlined" style="font-size:14px;">arrow_back</span>
+            </a>
+        </div>
+        <div class="cat-bar no-scrollbar" id="catBar">
+            <button onclick="filterByCategory('all',this)"         class="cat-pill active">كل المنتجات</button>
+            <button onclick="filterByCategory('electronics',this)"  class="cat-pill">
+                <span class="material-symbols-outlined" style="font-size:13px;">devices</span> إلكترونيات
+            </button>
+            <button onclick="filterByCategory('clothing',this)"     class="cat-pill">
+                <span class="material-symbols-outlined" style="font-size:13px;">checkroom</span> ملابس وموضة
+            </button>
+            <button onclick="filterByCategory('home',this)"         class="cat-pill">
+                <span class="material-symbols-outlined" style="font-size:13px;">weekend</span> منزل وأثاث
+            </button>
+            <button onclick="filterByCategory('cosmetics',this)"    class="cat-pill">
+                <span class="material-symbols-outlined" style="font-size:13px;">spa</span> تجميل وعناية
+            </button>
+            <button onclick="filterByCategory('food',this)"         class="cat-pill">
+                <span class="material-symbols-outlined" style="font-size:13px;">nutrition</span> غذاء وزراعة
+            </button>
+            <button onclick="filterByCategory('other',this)"        class="cat-pill">أخرى</button>
+        </div>
+    </section>
+
+
+    <!-- ── PRODUCTS (LARGEST SECTION) ── -->
+    <section id="productsSection" style="flex:1;">
+
+        <!-- Toolbar -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;padding-bottom:14px;border-bottom:1px solid var(--border);">
+            <div>
+                <h2 style="font-size:17px;font-weight:900;">صفقات الجملة الرائجة</h2>
+                <p style="font-size:11px;color:var(--text-muted);margin-top:3px;" id="productCountLabel">
+                    منتجات مباشرة من الموردين الموثّقين
+                </p>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:11px;color:var(--text-muted);">ترتيب:</span>
+                <select id="sortBy" onchange="renderProducts()"
+                        style="background:var(--surface);border:1.5px solid var(--border);border-radius:8px;padding:7px 12px;font-size:12px;color:var(--text);outline:none;font-family:inherit;cursor:pointer;">
+                    <option value="recent">الأحدث</option>
+                    <option value="price-low">السعر: من الأقل</option>
+                    <option value="price-high">السعر: من الأعلى</option>
+                    <option value="moq-low">أقل كمية (MOQ)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Loader -->
+        <div id="wholesaleLoader" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;gap:14px;">
+            <div class="spinner"></div>
+            <p style="font-size:13px;color:var(--text-muted);">جاري تحميل منتجات الجملة المعتمدة...</p>
+        </div>
+
+        <!-- Products Grid (compact cards) -->
+        <div id="productsGrid"></div>
+
+        <!-- Empty state -->
+        <div id="emptyState" style="display:none;text-align:center;padding:60px 20px;" class="card">
+            <span class="material-symbols-outlined" style="font-size:52px;color:var(--text-muted);">inventory_2</span>
+            <h3 style="font-size:15px;font-weight:700;margin-top:12px;">لا توجد منتجات</h3>
+            <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">جرّب تغيير التصنيف أو البحث بكلمة مختلفة.</p>
+        </div>
+    </section>
+</main>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════════ -->
+<footer class="site-footer">
+    <div class="footer-inner">
+        <!-- Brand -->
+        <div class="footer-brand">
+            <img src="images/8ff734c4-bd08-4561-b901-66de057fb3fc_removalai_preview.png" alt="كلش هنا"/>
+            <div class="brand-name">كلش هنا B2B</div>
+            <p class="footer-desc">المنصة الأولى المعتمدة في الجزائر لربط تجار الجملة والمستوردين مع المشترين مباشرةً.</p>
+        </div>
+        <!-- Links -->
+        <div class="footer-links">
+            <h4>روابط سريعة</h4>
+            <a href="index.html">الصفحة الرئيسية</a>
+            <a href="dashboard.html">لوحة تحكم التاجر</a>
+        </div>
+        <div class="footer-links">
+            <h4>الموارد</h4>
+            <a href="#">سياسة MOQ</a>
+            <a href="#">الموردون الموثّقون</a>
+            <a href="#">ضمان الصفقات</a>
+        </div>
+        <!-- Newsletter -->
+        <div class="footer-newsletter">
+            <h4>تنبيهات الصفقات</h4>
+            <div class="newsletter-row">
+                <input type="email" placeholder="بريدك الإلكتروني"/>
+                <button class="btn-brand" style="padding:8px 14px;font-size:12px;">انضمام</button>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        &copy; 2026 كلش هنا B2B — جميع الحقوق محفوظة. منصة ناشئة للابتكار التجاري.
+    </div>
+</footer>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script src="js/wholesale.js?v=6"></script>
+
+</body>
+</html>

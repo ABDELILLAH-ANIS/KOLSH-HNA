@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-key="choose_plan_title">اختر الباقة - كلش هنا</title>
+  <link href="https://fonts.googleapis.com/css2?family=Gumela&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/package.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <!-- ملف الترجمة الخاص بالباقات -->
+  <script src="js/package_translations.js"></script>
+</head>
+<body>
+  <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+  <!-- التنقل العلوي -->
+  <div class="top-nav">
+    <button class="nav-icon-btn back-nav-btn" onclick="goBack()" title="رجوع">
+      <i class="fas fa-chevron-right" style="margin-left: 6px;"></i> <span data-key="back">رجوع</span>
+    </button>
+    <div class="nav-right-buttons">
+      <!-- زر "تسجيل الدخول" للمشتركين القدامى -->
+      <button class="nav-icon-btn login-nav-btn" onclick="redirectToLogin()" title="تسجيل الدخول للمشتركين">
+        <i class="fas fa-sign-in-alt"></i>
+      </button>
+      <!-- زر الترجمة -->
+      <button class="nav-icon-btn" onclick="toggleLangModal()" title="اللغة">
+        <i class="fas fa-globe"></i>
+      </button>
+    </div>
+  </div>
+
+  <h2 class="page-title" data-key="choose_plan_title">اختر الباقة المناسبة لمتجرك</h2>
+
+  <!-- إعلان خاص للدفع بالعملة الصعبة -->
+  <div style="background: rgba(189, 0, 255, 0.1); border: 1px dashed var(--vip-purple); color: #fff; padding: 15px; border-radius: 12px; max-width: 800px; margin: 0 auto 20px; display: flex; align-items: center; gap: 15px;">
+    <div style="font-size: 32px;">🌍</div>
+    <div style="text-align: right;">
+      <h4 style="margin: 0 0 5px; color: var(--vip-purple); font-size: 16px;">عرض حصري للمدفوعات الدولية</h4>
+      <p style="margin: 0; font-size: 14px; color: var(--text-secondary);">احصل على <strong>خصم 25%</strong> عند الدفع السنوي بالدولار (USD) أو اليورو (EUR). <a href="https://wa.me/213000000000" target="_blank" style="color: var(--neon-green); font-weight: bold; text-decoration: none;">تواصل معنا الآن</a> لتفعيل العرض!</p>
+    </div>
+  </div>
+
+  <!-- مفتاح التحويل الشهري/السنوي -->
+  <div class="billing-toggle">
+    <span data-key="monthly">شهري</span>
+    <label class="switch">
+      <input type="checkbox" id="billingCycle" onchange="updatePricing()">
+      <span class="slider round"></span>
+    </label>
+    <span data-key="yearly">سنوي <small class="discount">(خصم 20%)</small></span>
+  </div>
+
+  <!-- شبكة الباقات -->
+  <div class="plans" id="plansGrid">
+    <!-- الباقة الأساسية -->
+    <div class="plan fade-in" data-plan="basic">
+      <h3><i class="fas fa-briefcase" style="color:var(--neon-green); margin-left: 8px;"></i> <span data-key="plan_basic">الأساسية (Basic)</span></h3>
+      <div class="price" id="price-basic">
+        <span id="amount-basic">500</span>
+        <span data-key="currency">دج</span>
+      </div>
+      <ul class="features">
+        <li data-key="f_basic_1">5 منتجات</li>
+        <li data-key="f_visitors">إحصائيات عدد الزوار</li>
+        <li data-key="f_email_support">دعم عبر البريد الإلكتروني</li>
+      </ul>
+      <button class="select-btn" onclick="selectPlan('basic')" data-key="select_button">اختيار</button>
+    </div>
+
+    <!-- الباقة الذهبية -->
+    <div class="plan fade-in popular" data-plan="gold">
+      <span class="badge" data-key="plan_badge_gold">شائعة</span>
+      <h3><i class="fas fa-award" style="color:#fdcb6e; margin-left: 8px;"></i> <span data-key="plan_gold">الذهبية (Gold)</span></h3>
+      <div class="price" id="price-gold">
+        <span id="amount-gold">3000</span>
+        <span data-key="currency">دج</span>
+      </div>
+      <ul class="features">
+        <li data-key="f_gold_1">20 منتج</li>
+        <li data-key="f_visitors">إحصائيات عدد الزوار</li>
+        <li data-key="f_priority">أولوية عند البحث</li>
+        <li data-key="f_email_support">دعم عبر البريد الإلكتروني</li>
+      </ul>
+      <button class="select-btn" onclick="selectPlan('gold')" data-key="select_button">اختيار</button>
+    </div>
+
+    <!-- الباقة المميزة -->
+    <div class="plan fade-in" data-plan="premium">
+      <h3><i class="fas fa-gem" style="color:#00d2ff; margin-left: 8px;"></i> <span data-key="plan_premium">بريميوم (Premium)</span></h3>
+      <div class="price" id="price-premium">
+        <span id="amount-premium">8500</span>
+        <span data-key="currency">دج</span>
+      </div>
+      <ul class="features">
+        <li data-key="f_premium_1">50 منتج</li>
+        <li data-key="f_visitors">إحصائيات عدد الزوار</li>
+        <li data-key="f_sales_stats">إحصاء المبيعات (يدوي)</li>
+        <li data-key="f_homepage">ظهور في الواجهة الرئيسية</li>
+      </ul>
+      <button class="select-btn" onclick="selectPlan('premium')" data-key="select_button">اختيار</button>
+    </div>
+
+    <!-- الباقة VIP -->
+    <div class="plan fade-in" data-plan="vip">
+      <span class="badge" data-key="plan_badge_vip">الأفضل</span>
+      <h3><i class="fas fa-crown" style="color:var(--vip-purple); margin-left: 8px;"></i> <span data-key="plan_vip">VIP</span></h3>
+      <div class="price" id="price-vip">
+        <span id="amount-vip">14000</span>
+        <span data-key="currency">دج</span>
+      </div>
+      <ul class="features">
+        <li data-key="f_unlimited">منتجات غير محدودة</li>
+        <li data-key="f_priority_support">أولوية الدعم الفني</li>
+        <li data-key="f_full_analytics">إحصاء شامل للمتجر</li>
+        <li data-key="f_custom_ui">واجهة خاصة للمتجر</li>
+        <li data-key="f_vip_ads">إعلانات في الواجهة</li>
+        <li data-key="f_social_ads">إعلانات ممولة في مواقع التواصل (3/شهرياً)</li>
+      </ul>
+      <button class="select-btn" onclick="selectPlan('vip')" data-key="select_button">اختيار</button>
+    </div>
+  </div>
+
+  <!-- نافذة اللغات -->
+  <div id="langModal" class="lang-modal">
+    <h3 data-key="select_language">اختر اللغة</h3>
+    <div class="lang-options">
+      <button onclick="packageSwitchLanguage('ar')">🇩🇿 العربية</button>
+      <button onclick="packageSwitchLanguage('fr')">🇫🇷 Français</button>
+      <button onclick="packageSwitchLanguage('en')">🇺🇸 English</button>
+    </div>
+    <button class="close-modal-btn" onclick="toggleLangModal()" data-key="close_btn">إغلاق</button>
+  </div>
+
+  <script src="js/package.js"></script>
+</body>
+</html>

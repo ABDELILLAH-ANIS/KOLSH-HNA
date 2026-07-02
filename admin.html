@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="لوحة الإدارة الشاملة - منصة كلش هنا للتجارة الإلكترونية" />
+  <title>لوحة الإدارة V4 - كلش هنا</title>
+  <link href="https://fonts.googleapis.com/css2?family=Gumela&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <!-- Chart.js for analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/security.js" defer></script>
+  <script src="js/analytics.js" defer></script>
+</head>
+<body class="admin-theme">
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SECURE LOADER                                   -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div id="adminLoader" class="admin-loader">
+    <div class="loader-content">
+      <div class="admin-spinner"></div>
+      <p>جاري التحقق من الصلاحيات...</p>
+    </div>
+  </div>
+  <script>
+    setTimeout(() => {
+      const l = document.getElementById('adminLoader');
+      if (l) l.classList.add('hidden');
+    }, 5000);
+  </script>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- SIDEBAR NAVIGATION                              -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <img src="images/logo.png" alt="كلش هنا" class="admin-logo" />
+      <div class="sidebar-brand">
+        <h2>لوحة الإدارة</h2>
+        <span class="sidebar-version">V4</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" role="navigation" aria-label="Admin Navigation">
+
+      <!-- KPI Command Center -->
+      <button type="button" class="nav-item active" data-section="overview" onclick="switchSection('overview')" id="nav-overview">
+        <i class="fas fa-chart-pie"></i>
+        <span>نظرة عامة</span>
+      </button>
+
+      <!-- Pending Activations -->
+      <button type="button" class="nav-item" data-section="pending" onclick="switchSection('pending')" id="nav-pending">
+        <i class="fas fa-clock"></i>
+        <span>طلبات التفعيل</span>
+        <span class="nav-badge" id="pendingBadge" style="display:none;">0</span>
+      </button>
+
+      <!-- Merchants -->
+      <button type="button" class="nav-item" data-section="users" onclick="switchSection('users')" id="nav-users">
+        <i class="fas fa-users"></i>
+        <span>المستخدمون</span>
+      </button>
+
+      <button type="button" class="nav-item" data-section="stores" onclick="switchSection('stores')" id="nav-stores">
+        <i class="fas fa-store"></i>
+        <span>المتاجر</span>
+      </button>
+
+      <button type="button" class="nav-item" data-section="products" onclick="switchSection('products')" id="nav-products">
+        <i class="fas fa-box"></i>
+        <span>المنتجات</span>
+      </button>
+
+      <!-- Divider: Communications -->
+      <div class="sidebar-section-label">التواصل والدعم</div>
+
+      <button type="button" class="nav-item" data-section="notifications" onclick="switchSection('notifications')" id="nav-notifications">
+        <i class="fas fa-bell"></i>
+        <span>الإشعارات</span>
+        <span class="nav-badge" id="notifBadge" style="display:none;">0</span>
+      </button>
+
+      <button type="button" class="nav-item" data-section="helpdesk" onclick="switchSection('helpdesk')" id="nav-helpdesk">
+        <i class="fas fa-headset"></i>
+        <span>مركز الدعم</span>
+        <span class="nav-badge" id="helpdeskBadge" style="display:none;">0</span>
+      </button>
+
+      <button type="button" class="nav-item" data-section="upgrade-requests" onclick="switchSection('upgrade-requests')" id="nav-upgrade-requests">
+        <i class="fas fa-arrow-up"></i>
+        <span>طلبات الترقية</span>
+        <span class="nav-badge" id="upgradeBadge" style="display:none;">0</span>
+      </button>
+
+      <button type="button" class="nav-item" data-section="broadcast" onclick="switchSection('broadcast')" id="nav-broadcast">
+        <i class="fab fa-whatsapp"></i>
+        <span>بث واتساب</span>
+      </button>
+
+      <!-- Divider: Content Management -->
+      <div class="sidebar-section-label">إدارة المحتوى</div>
+
+      <button type="button" class="nav-item nav-vip" data-section="ads" onclick="switchSection('ads')" id="nav-ads">
+        <i class="fas fa-ad"></i>
+        <span>إعلانات VIP</span>
+        <span class="nav-badge nav-badge-gold" id="adsBadge" style="display:none;">0</span>
+      </button>
+
+      <button type="button" class="nav-item" data-section="realestate" onclick="switchSection('realestate')" id="nav-realestate">
+        <i class="fas fa-building"></i>
+        <span>إعلانات العقارات</span>
+      </button>
+
+      <button type="button" class="nav-item" data-section="announcements" onclick="switchSection('announcements')" id="nav-announcements">
+        <i class="fas fa-bullhorn"></i>
+        <span>إعلانات الموقع</span>
+      </button>
+
+      <button type="button" class="nav-item" data-section="themes" onclick="switchSection('themes')" id="nav-themes">
+        <i class="fas fa-palette"></i>
+        <span>ثيمات المناسبات</span>
+      </button>
+
+      <!-- Divider: System -->
+      <div class="sidebar-section-label">النظام</div>
+
+      <button type="button" class="nav-item" data-section="audit" onclick="switchSection('audit')" id="nav-audit">
+        <i class="fas fa-shield-alt"></i>
+        <span>سجل التدقيق</span>
+      </button>
+
+      <button type="button" class="nav-item" data-section="dcb" onclick="switchSection('dcb')" id="nav-dcb">
+        <i class="fas fa-mobile-alt"></i>
+        <span>الدفع بالرصيد (DCB)</span>
+      </button>
+
+      <button type="button" class="nav-item nav-warning" data-section="dummydata" onclick="switchSection('dummydata')" id="nav-dummydata">
+        <i class="fas fa-database"></i>
+        <span>بيانات الاختبار</span>
+      </button>
+
+      <!-- Divider: Quick Actions -->
+      <div class="sidebar-divider"></div>
+
+      <a href="dashboard.html?admin_preview=true" class="nav-item nav-preview" style="text-decoration:none;">
+        <i class="fas fa-store-alt"></i>
+        <span>معاينة لوحة التاجر</span>
+      </a>
+
+      <button type="button" class="nav-item" onclick="adminSwitchPackage()">
+        <i class="fas fa-exchange-alt"></i>
+        <span>تجربة باقة أخرى</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="admin-user-info" id="adminUserInfo">
+        <div class="admin-avatar" id="adminAvatar">A</div>
+        <div class="admin-user-details">
+          <span class="admin-name" id="adminName">الإدارة</span>
+          <span class="admin-role-badge">SuperAdmin</span>
+        </div>
+      </div>
+      <button type="button" class="logout-btn" onclick="adminLogout()" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>خروج</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Mobile Menu Button -->
+  <button type="button" class="mobile-menu-btn" id="mobileMenuBtn" onclick="toggleSidebar()" aria-label="فتح القائمة">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- MAIN CONTENT                                    -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <main class="main-content" id="mainContent">
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SECTION: KPI COMMAND CENTER (OVERVIEW) -->
+    <!-- ══════════════════════════════════════ -->
+    <section id="sec-overview" class="section active">
+      <div class="section-header">
+        <h1 class="section-title"><i class="fas fa-chart-pie"></i> مركز القيادة</h1>
+        <button type="button" class="refresh-btn" onclick="loadOverview()" title="تحديث البيانات">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+      </div>
+
+      <!-- Live KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-users">
+          <div class="kpi-icon"><i class="fas fa-users"></i></div>
+          <div class="kpi-data">
+            <div class="kpi-value" id="kpiTotalUsers">—</div>
+            <div class="kpi-label">إجمالي المستخدمين</div>
+            <div class="kpi-sub" id="kpiNewSignups">+0 اليوم</div>
+          </div>
+          <canvas class="kpi-sparkline" id="sparkUsers" width="80" height="40"></canvas>
+        </div>
+
+        <div class="kpi-card kpi-merchants">
+          <div class="kpi-icon"><i class="fas fa-store"></i></div>
+          <div class="kpi-data">
+            <div class="kpi-value" id="kpiActiveMerchants">—</div>
+            <div class="kpi-label">متاجر نشطة</div>
+            <div class="kpi-sub" id="kpiTotalMerchants">من إجمالي 0</div>
+          </div>
+          <canvas class="kpi-sparkline" id="sparkMerchants" width="80" height="40"></canvas>
+        </div>
+
+        <div class="kpi-card kpi-orders">
+          <div class="kpi-icon"><i class="fas fa-shopping-cart"></i></div>
+          <div class="kpi-data">
+            <div class="kpi-value" id="kpiTotalOrders">—</div>
+            <div class="kpi-label">إجمالي الطلبات</div>
+            <div class="kpi-sub" id="kpiOrdersToday">+0 اليوم</div>
+          </div>
+          <canvas class="kpi-sparkline" id="sparkOrders" width="80" height="40"></canvas>
+        </div>
+
+        <div class="kpi-card kpi-revenue">
+          <div class="kpi-icon"><i class="fas fa-coins"></i></div>
+          <div class="kpi-data">
+            <div class="kpi-value" id="kpiRevenue">—</div>
+            <div class="kpi-label">إيرادات الاشتراكات</div>
+            <div class="kpi-sub" id="kpiRevenueGrowth">MRR</div>
+          </div>
+          <canvas class="kpi-sparkline" id="sparkRevenue" width="80" height="40"></canvas>
+        </div>
+
+        <div class="kpi-card kpi-pending-alert">
+          <div class="kpi-icon"><i class="fas fa-hourglass-half"></i></div>
+          <div class="kpi-data">
+            <div class="kpi-value kpi-alert" id="kpiPendingCount">—</div>
+            <div class="kpi-label">بانتظار التفعيل</div>
+            <div class="kpi-sub">
+              <button type="button" class="kpi-action-btn" onclick="switchSection('pending')">معالجة الآن</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-card kpi-vip">
+          <div class="kpi-icon" style="color:#ffd700;"><i class="fas fa-crown"></i></div>
+          <div class="kpi-data">
+            <div class="kpi-value" id="kpiVipCount">—</div>
+            <div class="kpi-label">متاجر VIP</div>
+            <div class="kpi-sub" id="kpiVipRevenue">أعلى باقة</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plan Distribution -->
+      <div class="cards-row">
+        <div class="card card-half">
+          <h2 class="card-title"><i class="fas fa-layer-group"></i> توزيع الباقات</h2>
+          <div class="packages-grid" id="packagesGrid">
+            <div class="pkg-stat pkg-basic"><span class="pkg-count" id="countBasic">0</span><span class="pkg-label">Basic</span><div class="pkg-bar"><div class="pkg-fill" id="barBasic"></div></div></div>
+            <div class="pkg-stat pkg-gold"><span class="pkg-count" id="countGold">0</span><span class="pkg-label">Gold</span><div class="pkg-bar"><div class="pkg-fill" id="barGold"></div></div></div>
+            <div class="pkg-stat pkg-premium"><span class="pkg-count" id="countPremium">0</span><span class="pkg-label">Premium</span><div class="pkg-bar"><div class="pkg-fill" id="barPremium"></div></div></div>
+            <div class="pkg-stat pkg-vip"><span class="pkg-count" id="countVip">0</span><span class="pkg-label">VIP</span><div class="pkg-bar"><div class="pkg-fill" id="barVip"></div></div></div>
+          </div>
+        </div>
+
+        <div class="card card-half">
+          <h2 class="card-title"><i class="fas fa-user-plus"></i> آخر التسجيلات</h2>
+          <div class="table-wrapper">
+            <table id="recentSignupsTable">
+              <thead><tr><th>الاسم</th><th>البريد</th><th>الباقة</th><th>الحالة</th><th>التاريخ</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Revenue Chart -->
+      <div class="card">
+        <h2 class="card-title"><i class="fas fa-chart-line"></i> منحنى الاشتراكات (30 يوم)</h2>
+        <div class="chart-container">
+          <canvas id="revenueChart" height="120"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SECTION: PENDING ACTIVATIONS           -->
+    <!-- ══════════════════════════════════════ -->
+    <section id="sec-pending" class="section">
+      <h1 class="section-title"><i class="fas fa-clock"></i> طلبات بانتظار التفعيل</h1>
+      <div class="table-wrapper">
+        <table id="pendingTable">
+          <thead><tr><th>الاسم</th><th>البريد</th><th>الهاتف</th><th>الباقة</th><th>السعر</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="noPending" class="empty-state" style="display:none;">
+        <i class="fas fa-check-circle" style="color:#00ffc3;font-size:48px;"></i>
+        <h3>لا توجد طلبات معلقة</h3>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SECTION: USERS MANAGEMENT              -->
+    <!-- ══════════════════════════════════════ -->
+    <section id="sec-users" class="section">
+      <h1 class="section-title"><i class="fas fa-users"></i> إدارة المستخدمين</h1>
+      <div class="toolbar">
+        <input type="text" id="userSearch" placeholder="بحث بالاسم أو البريد..." oninput="searchUsers()" />
+        <select id="userStatusFilter" onchange="filterUsers()">
+          <option value="all">كل الحالات</option>
+          <option value="pending_approval">بانتظار الموافقة</option>
+          <option value="active">مفعّل</option>
+          <option value="suspended">موقوف</option>
+        </select>
+        <select id="userPlanFilter" onchange="filterUsers()">
+          <option value="all">كل الباقات</option>
+          <option value="vip">VIP</option>
+          <option value="premium">Premium</option>
+          <option value="gold">Gold</option>
+          <option value="basic">Basic</option>
+        </select>
+      </div>
+      <div class="table-wrapper">
+        <table id="usersTable">
+          <thead><tr><th>الاسم</th><th>البريد</th><th>الهاتف</th><th>الباقة</th><th>الحالة</th><th>الدفع</th><th>الصحة</th><th>إجراءات</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SECTION: STORES MANAGEMENT             -->
+    <!-- ══════════════════════════════════════ -->
+    <section id="sec-stores" class="section">
+      <h1 class="section-title"><i class="fas fa-store"></i> إدارة المتاجر</h1>
+      <div class="toolbar">
+        <input type="text" id="storeSearch" placeholder="بحث بالاسم..." oninput="searchStoresAdmin()" />
+        <select id="storeFilter" onchange="filterStores()">
+          <option value="all">كل الباقات</option>
+          <option value="vip">VIP</option>
+          <option value="premium">Premium</option>
+          <option value="gold">Gold</option>
+          <option value="basic">Basic</option>
+        </select>
+        <select id="storeStatusFilter" onchange="filterStores()">
+          <option value="all">كل الحالات</option>
+          <option value="active">نشط</option>
+          <option value="suspended">موقوف</option>
+          <option value="pending_approval">بانتظار</option>
+        </select>
+        <select id="storeTypeFilter" onchange="filterStores()">
+          <option value="all">كل أنواع المتاجر</option>
+          <option value="wholesaler">تجار الجملة (B2B)</option>
+          <option value="retailer">تجار التجزئة (B2C)</option>
+        </select>
+      </div>
+      <div class="table-wrapper">
+        <table id="storesTable">
+          <thead><tr><th>المتجر</th><th>المالك</th><th>التصنيف</th><th>الولاية</th><th>مميز</th><th>معتمد B2B</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SECTION: PRODUCTS                      -->
+    <!-- ══════════════════════════════════════ -->
+    <section id="sec-products" class="section">
+      <h1 class="section-title"><i class="fas fa-box"></i> جميع المنتجات</h1>
+      <div class="toolbar">
+        <input type="text" id="productSearch" placeholder="بحث بالاسم..." oninput="searchProductsAdmin()" />
+      </div>
+      <div class="products-admin-grid" id="adminProductsGrid"></div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SECTION: NOTIFICATIONS                 -->
+    <!-- ══════════════════════════════════════ -->
+    <section id="sec-notifications" class="section">
+      <div class="section-header">
+        <h1 class="section-title"><i class="fas fa-bell"></i> الإشعارات</h1>
+        <button type="button" class="action-btn" onclick="markAllRead()">
+          <i class="fas fa-check-double"></i> تعليم الكل كمقروء
+        </button>
+      </div>
+      <div class="toolbar">
+        <select id="notifTypeFilter" onchange="filterNotifications()">
+          <option value="all">كل الأنواع</option>
+          <option value="new_signup">تسجيلات جديدة</option>
+          <option value="new_order">طلبات جديدة</option>
+          <option value="upgrade_request">طلبات ترقية</option>
+          <option value="ad_design_request">تصميم إعلانات</option>
+          <option value="ai_escalation">تصعيد AI</option>
+        </select>
+        <select id="notifPriorityFilter" onchange="filterNotifications()">
+          <option value="all">كل الأولويات</option>
+          <option value="urgent">عاجل</option>
+          <option value="high">عالي</option>
+          <option value="normal">عادي</option>
+          <option value="low">منخفض</option>
+        </select>
+      </div>
+      <div id="notificationsList" class="notifications-list"></div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SECTION: HELPDESK                      -->
+    <!-- ══════════════════════════════════════ -->
+    <section id="sec-helpdesk" class="section">
+      <h1 class="section-title"><i class="fas fa-headset"></i> مركز الدعم والمساعدة</h1>
+      <div class="toolbar">
+        <select id="ticketStatusFilter" onchange="filterTickets()">
+          <option value="open">مفتوح</option>
+          <option value="in_progress">قيد المعالجة</option>
+          <option value="resolved">محلول</option>
+          <option value="closed">مغلق</option>
+          <option value="all">الكل</option>
+        </select>
+        <select id="ticketSourceFilter" onchange="filterTickets()">
+          <option value="all">كل المصادر</option>
+          <option value="contact">نموذج التواصل</option>
+          <option value="ai_escalation">تصعيد AI</option>
+          <option value="merchant_report">بلاغ تاجر</option>
+        </select>
+        <select id="ticketPriorityFilter" onchange="filterTickets()">
+          <option value="all">كل الأولويات</option>
+          <option value="urgent">عاجل</option>
+          <option value="high">عالي</option>
+          <option value="normal">عادي</option>
+          <option value="low">منخفض</option>
+        </select>
+      </div>
+      <div id="ticketsList" class="tickets-list"></div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SECTION: UPGRADE REQUESTS              -->
+    <!-- ══════════════════════════════════════ -->
+    <section id="sec-upgrade-requests" class="section">
+      <h1 class="section-title"><i class="fas fa-arrow-up"></i> طلبات ترقية الباقة</h1>
+      <div id="upgradeRequestsList" class="upgrade-list"></div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SECTION: WHATSAPP BROADCAST            -->
+    <!-- ══════════════════════════════════════ -->
+    <section id="sec-broadcast" class="section">
+      <h1 class="section-title"><i class="fab fa-whatsapp"></i> بث رسالة واتساب</h1>
+      <div class="card">
+        <h2 class="card-title"><i class="fas fa-filter"></i> استهداف المستلمين</h2>
+        <div class="form-row">
+          <div class="form-group">
+            <label>نوع المستلمين</label>
+            <select id="broadcastTarget">
+              <option value="pending">التجار بانتظار التفعيل</option>
+              <option value="active">التجار النشطين (الكل)</option>
+              <option value="basic">باقة Basic فقط</option>
+              <option value="gold">باقة Gold فقط</option>
+              <option value="premium">باقة Premium فقط</option>
+              <option value="vip">باقة VIP فقط</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>المستلمون المحددون <span id="broadcastCount" class="badge-count">0</span></label>
+            <button type="button" class="action-btn sm" onclick="previewBroadcastTargets()">
+              <i class="fas fa-eye"></i> معاينة القائمة
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>نص الرسالة</label>
+          <textarea id="broadcastMessage" rows="5" placeholder="اكتب رسالتك هنا... يمكنك استخدام {name} و {plan} و {email} كمتغيرات ديناميكية"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>معاينة رسالة مخصصة</label>
+          <div class="broadcast-preview" id="broadcastPreview">
+            <em style="color:rgba(255,255,255,0.3);">ستظهر معاينة الرسالة هنا...</em>
+          </div>
+        </div>
+
+        <button type="button" class="action-btn primary-btn" onclick="generateBroadcastLinks()">
+          <i class="fas fa-link"></i> توليد روابط واتساب
+        </button>
+      </div>
+
+      <div class="card" id="broadcastLinksCard" style="display:none;">
+        <h2 class="card-title"><i class="fas fa-list"></i> روابط واتساب المولّدة</h2>
+        <div id="broadcastLinksList" class="broadcast-links-list"></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SECTION: VIP ADS MANAGEMENT            -->
+    <!-- ══════════════════════════════════════ -->
+    <section id="sec-ads" class="section">
+      <h1 class="section-title" style="color:#ffd700;">
+        <i class="fas fa-ad"></i> إدارة إعلانات VIP
+      </h1>
+
+      <!-- Active VIP ads -->
+      <div class="card">
+        <h2 class="card-title" style="color:#ffd700;"><i class="fas fa-play-circle"></i> إعلانات نشطة في الكاروسيل</h2>
+        <p class="card-desc">هذه الإعلانات تظهر للزوار في الشريط الإعلاني الرئيسي (يتجدد كل 10 ثوانٍ)</p>
+        <div class="table-wrapper">
+          <table id="vipAdsTable">
+            <thead>
+              <tr><th>المتجر</th><th>البريد</th><th>عنوان الإعلان</th><th>الحالة</th><th>معاينة</th><th>إجراءات</th></tr>
+            </thead>
+            <tbody id="vipAdsTableBody">
+              <tr><td colspan="6" style="text-align:center;padding:20px;color:#555;">جاري التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Ad Design Requests -->
+      <div class="card">
+        <h2 class="card-title" style="color:#ffd700;"><i class="fas fa-palette"></i> طلبات تصميم الإعلانات</h2>
+        <div id="adRequestsList" class="notifications-list">
+          <div class="empty-state"><i class="fas fa-ad"></i><h3>لا توجد طلبات تصميم</h3></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SECTION: REAL ESTATE MANAGEMENT        -->
+    <!-- ══════════════════════════════════════ -->
+    <section id="sec-realestate" class="section">
+      <div class="section-header">
+        <h1 class="section-title"><i class="fas fa-building"></i> إدارة إعلانات العقارات</h1>
+        <button type="button" class="refresh-btn" onclick="loadRealEstateListings()" title="تحديث البيانات">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+      </div>
+
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
+          <div>
+            <h2 class="card-title"><i class="fas fa-list"></i> قائمة إعلانات العقارات المنشورة</h2>
+            <p class="card-desc">تحكم بتمييز العقارات وتوفرها وحذف الإعلانات المخالفة</p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <select id="reAdminFilterWilaya" onchange="filterRealEstateListings()" style="padding:8px 12px; border-radius:6px; background:#2c354a; color:white; border:1px solid rgba(255,255,255,0.1); font-family:inherit;">
+              <option value="">كل الولايات</option>
+              <option value="16">16 - الجزائر العاصمة</option>
+              <option value="31">31 - وهران</option>
+              <option value="25">25 - قسنطينة</option>
+              <option value="9">09 - البليدة</option>
+              <option value="19">19 - سطيف</option>
+              <option value="6">06 - بجاية</option>
+              <option value="15">15 - تيزي وزو</option>
+              <option value="34">34 - بومرداس</option>
+              <option value="42">42 - تيبازة</option>
+              <option value="5">05 - باتنة</option>
+              <option value="26">26 - المدية</option>
+              <option value="44">44 - مستغانم</option>
+              <option value="23">23 - عنابة</option>
+              <option value="13">13 - تلمسان</option>
+              <option value="3">03 - الأغواط</option>
+              <option value="7">07 - بسكرة</option>
+              <option value="18">18 - جيجل</option>
+              <option value="21">21 - سكيكدة</option>
+            </select>
+            <select id="reAdminFilterType" onchange="filterRealEstateListings()" style="padding:8px 12px; border-radius:6px; background:#2c354a; color:white; border:1px solid rgba(255,255,255,0.1); font-family:inherit;">
+              <option value="">كل أنواع العرض</option>
+              <option value="sale">بيع</option>
+              <option value="rent">إيجار</option>
+              <option value="vacation">اصطياف</option>
+              <option value="commercial">تجاري</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>صورة المعاينة</th>
+                <th>العنوان</th>
+                <th>الموقع</th>
+                <th>السعر</th>
+                <th>الهاتف</th>
+                <th>المظهر (متاح)</th>
+                <th>VIP مميز</th>
+                <th>التاريخ</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="realEstateTableBody">
+              <tr><td colspan="9" style="text-align:center;padding:30px;color:rgba(255,255,255,0.4);">جاري التحميل...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SECTION: PLATFORM ANNOUNCEMENTS        -->
+    <!-- ══════════════════════════════════════ -->
+    <section id="sec-announcements" class="section">
+      <h1 class="section-title"><i class="fas fa-bullhorn"></i> إعلانات الموقع العامة</h1>
+
+      <!-- Create new announcement -->
+      <div class="card">
+        <h2 class="card-title"><i class="fas fa-plus-circle"></i> نشر إعلان جديد</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="annTitle">عنوان الإعلان *</label>
+            <input type="text" id="annTitle" placeholder="مثال: عرض خاص لشهر رمضان" maxlength="100" />
+          </div>
+          <div class="form-group">
+            <label for="annType">نوع الإعلان</label>
+            <select id="annType">
+              <option value="info">معلومات</option>
+              <option value="promo">ترويج</option>
+              <option value="warning">تحذير</option>
+              <option value="event">مناسبة</option>
+            </select>
+          </div>
+          <div class="form-group form-full">
+            <label for="annContent">نص الإعلان</label>
+            <textarea id="annContent" rows="3" placeholder="اكتب تفاصيل الإعلان هنا..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="annCtaText">نص الزر (اختياري)</label>
+            <input type="text" id="annCtaText" placeholder="مثال: اكتشف الآن" />
+          </div>
+          <div class="form-group">
+            <label for="annCtaUrl">رابط الزر (اختياري)</label>
+            <input type="url" id="annCtaUrl" placeholder="https://..." />
+          </div>
+          <div class="form-group">
+            <label for="annEndAt">تاريخ انتهاء (اختياري)</label>
+            <input type="datetime-local" id="annEndAt" />
+          </div>
+          <div class="form-group">
+            <label for="annShowOn">صفحات العرض</label>
+            <select id="annShowOn" multiple style="height: 120px;">
+              <option value="home" selected>الصفحة الرئيسية</option>
+              <option value="store">صفحات المتاجر</option>
+              <option value="wholesale">سوق الجملة B2B (كاروسيل قديم)</option>
+              <option value="wholesale_left">سوق الجملة B2B - إعلان اليسار (ثابت)</option>
+              <option value="wholesale_mid_top">سوق الجملة B2B - إعلان الوسط (أعلى ثابت)</option>
+              <option value="wholesale_mid_bottom">سوق الجملة B2B - إعلان الوسط (أسفل ثابت)</option>
+              <option value="dashboard">لوحة التاجر</option>
+            </select>
+          </div>
+          <div class="form-group" style="display:flex; gap:20px; flex-wrap:wrap; grid-column:span 2;">
+            <div style="flex:1; min-width:240px;">
+              <label for="annImageInput">صورة الإعلان (إذا كان الإعلان صورة)</label>
+              <input type="file" id="annImageInput" accept="image/*" onchange="previewAnnImage(this)" style="display:none;" />
+              <div style="display:flex;gap:10px;align-items:center;margin-top:6px;">
+                <button type="button" class="action-btn" onclick="document.getElementById('annImageInput').click()" style="background:var(--surface-2);color:var(--text);border:1.5px dashed var(--border);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;">
+                  <i class="fas fa-image" style="margin-left:5px;"></i> اختر صورة الإعلان
+                </button>
+                <div id="annImagePreview" style="display:none;position:relative;">
+                  <img id="annImagePreviewImg" src="" style="height:36px;border-radius:6px;border:1px solid var(--border);" />
+                  <button type="button" onclick="clearAnnImage()" style="position:absolute;top:-6px;left:-6px;background:red;color:#fff;border:none;border-radius:50%;width:16px;height:16px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>
+                </div>
+              </div>
+            </div>
+            <div style="flex:1; min-width:240px;">
+              <label for="annVideoInput">فيديو الإعلان (إذا كان الإعلان فيديو ثابت بجودة عالية)</label>
+              <input type="file" id="annVideoInput" accept="video/*" onchange="previewAnnVideo(this)" style="display:none;" />
+              <div style="display:flex;gap:10px;align-items:center;margin-top:6px;">
+                <button type="button" class="action-btn" onclick="document.getElementById('annVideoInput').click()" style="background:var(--surface-2);color:var(--text);border:1.5px dashed var(--border);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;">
+                  <i class="fas fa-video" style="margin-left:5px;"></i> اختر فيديو الإعلان
+                </button>
+                <div id="annVideoPreview" style="display:none;position:relative;">
+                  <video id="annVideoPreviewVid" src="" style="height:36px;width:60px;border-radius:6px;border:1px solid var(--border);object-fit:cover;" muted></video>
+                  <button type="button" onclick="clearAnnVideo()" style="position:absolute;top:-6px;left:-6px;background:red;color:#fff;border:none;border-radius:50%;width:16px;height:16px;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;">&times;</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="action-btn primary-btn" onclick="publishAnnouncement()">
+          <i class="fas fa-paper-plane"></i> نشر الإعلان
+        </button>
+      </div>
+
+      <!-- Active announcements list -->
+      <div class="card">
+        <h2 class="card-title"><i class="fas fa-list"></i> الإعلانات الحالية</h2>
+        <div id="announcementsList" class="announcements-list"></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SECTION: EVENT THEMES ENGINE           -->
+    <!-- ══════════════════════════════════════ -->
+    <section id="sec-themes" class="section">
+      <h1 class="section-title"><i class="fas fa-palette"></i> محرك ثيمات المناسبات</h1>
+
+      <!-- Create/Edit Theme -->
+      <div class="card">
+        <h2 class="card-title"><i class="fas fa-plus-circle"></i> إنشاء ثيم مناسبة جديد</h2>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="themeName">اسم المناسبة *</label>
+            <input type="text" id="themeName" placeholder="مثال: عيد الفطر 1446" />
+          </div>
+          <div class="form-group">
+            <label for="themeSlug">معرّف فريد (Slug) *</label>
+            <input type="text" id="themeSlug" placeholder="eid-fitr-1446" dir="ltr" />
+          </div>
+          <div class="form-group">
+            <label for="themeColorPrimary">اللون الأساسي</label>
+            <input type="color" id="themeColorPrimary" value="#007B5E" />
+          </div>
+          <div class="form-group">
+            <label for="themeColorAccent">لون التمييز</label>
+            <input type="color" id="themeColorAccent" value="#FFD700" />
+          </div>
+          <div class="form-group">
+            <label for="themeBannerUrl">رابط البانر (اختياري)</label>
+            <input type="url" id="themeBannerUrl" placeholder="https://..." />
+          </div>
+          <div class="form-group">
+            <label for="themeStartAt">تاريخ البداية</label>
+            <input type="datetime-local" id="themeStartAt" />
+          </div>
+          <div class="form-group">
+            <label for="themeEndAt">تاريخ الانتهاء</label>
+            <input type="datetime-local" id="themeEndAt" />
+          </div>
+          <div class="form-group form-full">
+            <label for="themeCssOverride">CSS مخصص (اختياري)</label>
+            <textarea id="themeCssOverride" rows="6" dir="ltr" placeholder="/* Custom CSS for this event theme */&#10;body { --neon-green: #FFD700; }&#10;header { background: linear-gradient(135deg, #007B5E, #004d3c) !important; }"></textarea>
+          </div>
+          <div class="form-group form-full">
+            <label for="themeParticlesCfg">إعدادات الجسيمات (JSON)</label>
+            <textarea id="themeParticlesCfg" rows="3" dir="ltr" placeholder='{"count": 30, "symbols": ["✨", "🌙", "⭐"], "colors": ["#FFD700"]}'></textarea>
+          </div>
+        </div>
+
+        <!-- Live CSS Preview -->
+        <div class="theme-preview-panel" id="themePreviewPanel">
+          <div class="preview-label">معاينة مباشرة</div>
+          <div class="preview-mock-header" id="previewMockHeader">
+            <div class="preview-mock-logo">كلش هنا</div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="action-btn secondary-btn" onclick="previewTheme()">
+            <i class="fas fa-eye"></i> معاينة
+          </button>
+          <button type="button" class="action-btn primary-btn" onclick="saveTheme()">
+            <i class="fas fa-save"></i> حفظ الثيم
+          </button>
+        </div>
+      </div>
+
+      <!-- Themes List -->
+      <div class="card">
+        <h2 class="card-title"><i class="fas fa-list"></i> الثيمات المحفوظة</h2>
+        <div id="themesList" class="themes-list"></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SECTION: AUDIT LOG                     -->
+    <!-- ══════════════════════════════════════ -->
+    <section id="sec-audit" class="section">
+      <h1 class="section-title"><i class="fas fa-shield-alt"></i> سجل التدقيق والأمان</h1>
+      <div class="toolbar">
+        <input type="text" id="auditSearch" placeholder="بحث في الإجراءات..." oninput="searchAudit()" />
+        <select id="auditActionFilter" onchange="filterAudit()">
+          <option value="all">كل الإجراءات</option>
+          <option value="ACTIVATE_MERCHANT">تفعيل التاجر</option>
+          <option value="SUSPEND_MERCHANT">تعليق التاجر</option>
+          <option value="UPGRADE_PLAN">ترقية الباقة</option>
+          <option value="PUBLISH_ANNOUNCEMENT">نشر إعلان</option>
+          <option value="ACTIVATE_THEME">تفعيل ثيم</option>
+          <option value="REPLY_TICKET">الرد على تذكرة</option>
+        </select>
+        <input type="date" id="auditDateFilter" onchange="filterAudit()" />
+      </div>
+      <div class="table-wrapper">
+        <table id="auditTable">
+          <thead><tr><th>الإجراء</th><th>المستهدف</th><th>القيمة القديمة</th><th>القيمة الجديدة</th><th>المسؤول</th><th>التاريخ</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SECTION: DUMMY DATA                    -->
+    <!-- ══════════════════════════════════════ -->
+    <section id="sec-dummydata" class="section">
+      <h1 class="section-title">
+        <i class="fas fa-database" style="color:#ff9f43"></i> بيانات الاختبار
+      </h1>
+      <div class="card" style="border:1px solid rgba(255,159,67,0.3);">
+        <h2 class="card-title" style="color:#ff9f43;"><i class="fas fa-magic"></i> مولّد البيانات الوهمية</h2>
+        <p class="card-desc">اختبر المنصة بمتاجر، منتجات، وطلبات وهمية. يمكنك إخفاؤها أو حذفها في أي وقت.</p>
+
+        <div class="dummy-stats-grid">
+          <div class="dummy-stat-box store-box">
+            <div class="dummy-icon">🏪</div>
+            <div class="dummy-title">متاجر وهمية</div>
+            <div class="dummy-count" id="dummyStoreCount">0 متجر</div>
+          </div>
+          <div class="dummy-stat-box product-box">
+            <div class="dummy-icon">📦</div>
+            <div class="dummy-title">منتجات وهمية</div>
+            <div class="dummy-count" id="dummyProductCount">0 منتج</div>
+          </div>
+          <div class="dummy-stat-box order-box">
+            <div class="dummy-icon">📋</div>
+            <div class="dummy-title">طلبات وهمية</div>
+            <div class="dummy-count" id="dummyOrderCount">0 طلب</div>
+          </div>
+        </div>
+
+        <div class="dummy-actions">
+          <button type="button" class="action-btn primary-dummy" onclick="generateDummyData()">
+            <i class="fas fa-play-circle"></i> توليد البيانات
+          </button>
+          <button type="button" class="action-btn show-dummy" onclick="showDummyData()">
+            <i class="fas fa-eye"></i> إظهار البيانات
+          </button>
+          <button type="button" class="action-btn hide-dummy" onclick="hideDummyData()">
+            <i class="fas fa-eye-slash"></i> إخفاء البيانات
+          </button>
+          <button type="button" class="action-btn delete-dummy" onclick="deleteDummyData()">
+            <i class="fas fa-trash"></i> حذف نهائي
+          </button>
+        </div>
+
+        <div id="dummyProgress" class="dummy-progress" style="display:none;">
+          <div class="progress-track"><div id="dummyProgressBar" class="progress-bar"></div></div>
+          <p id="dummyProgressText" class="progress-text">جاري التوليد...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════ -->
+    <!-- SECTION: DCB SYSTEM MANAGEMENT         -->
+    <!-- ══════════════════════════════════════ -->
+    <section id="sec-dcb" class="section">
+      <h1 class="section-title"><i class="fas fa-mobile-alt"></i> نظام الدفع عبر الرصيد (DCB)</h1>
+
+      <!-- DCB Stats Grid -->
+      <div class="kpi-grid" style="margin-bottom: 25px;">
+        <div class="kpi-card" style="background: linear-gradient(135deg, #0d2b45, #203c56); border: 1px solid rgba(0,255,195,0.2);">
+          <div class="kpi-icon"><i class="fas fa-mobile-alt"></i></div>
+          <div class="kpi-data">
+            <div class="kpi-value" id="dcbStatTotalTx">—</div>
+            <div class="kpi-label">إجمالي العمليات</div>
+            <div class="kpi-sub" id="dcbStatSuccessRate">نسبة النجاح: 0%</div>
+          </div>
+        </div>
+        <div class="kpi-card" style="background: linear-gradient(135deg, #0d2b45, #203c56); border: 1px solid rgba(0,255,195,0.2);">
+          <div class="kpi-icon" style="color: #00ffc3;"><i class="fas fa-money-bill-wave"></i></div>
+          <div class="kpi-data">
+            <div class="kpi-value" id="dcbStatTotalVolume">—</div>
+            <div class="kpi-label">حجم المبيعات بالرصيد</div>
+            <div class="kpi-sub">دينار جزائري (دج)</div>
+          </div>
+        </div>
+        <div class="kpi-card" style="background: linear-gradient(135deg, #0d2b45, #203c56); border: 1px solid rgba(0,255,195,0.2);">
+          <div class="kpi-icon" style="color: #ffd700;"><i class="fas fa-coins"></i></div>
+          <div class="kpi-data">
+            <div class="kpi-value" id="dcbStatFeesRevenue">—</div>
+            <div class="kpi-label">أرباح المنصة (الرسوم)</div>
+            <div class="kpi-sub" id="dcbStatFeePercent">النسبة الحالية: 0%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- B2B wholesale sales value by carrier -->
+      <div class="card" style="margin-bottom: 25px;">
+        <h2 class="card-title"><i class="fas fa-chart-pie"></i> مبيعات الجملة عبر المنصة (العربون المدفوع)</h2>
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin-top:15px;">
+          <div style="background:rgba(0,123,94,0.1); border:1px solid rgba(0,123,94,0.3); border-radius:10px; padding:15px; text-align:center;">
+            <div style="font-size:24px; font-weight:800; color:#00ffc3;" id="b2bSalesMobilis">0 دج</div>
+            <div style="font-size:12px; color:#aaa; margin-top:5px;">موبيليس (Mobilis)</div>
+          </div>
+          <div style="background:rgba(218,37,29,0.1); border:1px solid rgba(218,37,29,0.3); border-radius:10px; padding:15px; text-align:center;">
+            <div style="font-size:24px; font-weight:800; color:#ff4d4d;" id="b2bSalesDjezzy">0 دج</div>
+            <div style="font-size:12px; color:#aaa; margin-top:5px;">جازي (Djezzy)</div>
+          </div>
+          <div style="background:rgba(235,0,45,0.1); border:1px solid rgba(235,0,45,0.3); border-radius:10px; padding:15px; text-align:center;">
+            <div style="font-size:24px; font-weight:800; color:#ff6688;" id="b2bSalesOoredoo">0 دج</div>
+            <div style="font-size:12px; color:#aaa; margin-top:5px;">أوريدو (Ooredoo)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Cards Row -->
+      <div class="cards-row">
+        <!-- Global Settings Card -->
+        <div class="card card-half">
+          <h2 class="card-title"><i class="fas fa-sliders-h"></i> الإعدادات العامة للنظام</h2>
+          
+          <div class="form-grid" style="grid-template-columns: 1fr; gap: 15px;">
+            <div class="form-group" style="display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 8px; background: rgba(255,255,255,0.03);">
+              <label style="cursor: pointer; display: flex; align-items: center; gap: 10px; margin: 0;">
+                <input type="checkbox" id="dcbGlobalToggle" style="width: auto; height: auto;" />
+                <span style="font-weight: bold; color: #00ffc3;">تفعيل الدفع بالرصيد عالمياً</span>
+              </label>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="form-group">
+                <label for="dcbGlobalMaxLimit">الحد الأقصى لكل طلب (دج)</label>
+                <input type="number" id="dcbGlobalMaxLimit" placeholder="مثال: 5000" />
+              </div>
+              <div class="form-group">
+                <label for="dcbGlobalMinOrder">الحد الأدنى للطلب (دج)</label>
+                <input type="number" id="dcbGlobalMinOrder" placeholder="مثال: 100" />
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="form-group">
+                <label for="dcbGlobalFeePercent">رسوم الخدمة (%)</label>
+                <input type="number" step="0.01" id="dcbGlobalFeePercent" placeholder="مثال: 5.00" />
+              </div>
+              <div class="form-group">
+                <label for="dcbGlobalDailyLimit">الحد اليومي لكل رقم هاتف (دج)</label>
+                <input type="number" id="dcbGlobalDailyLimit" placeholder="مثال: 15000" />
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+              <div class="form-group">
+                <label for="dcbFeeMobilis">رسوم موبيليس (%)</label>
+                <input type="number" step="0.01" id="dcbFeeMobilis" placeholder="مثال: 2.00" />
+              </div>
+              <div class="form-group">
+                <label for="dcbFeeDjezzy">رسوم جازي (%)</label>
+                <input type="number" step="0.01" id="dcbFeeDjezzy" placeholder="مثال: 2.00" />
+              </div>
+              <div class="form-group">
+                <label for="dcbFeeOoredoo">رسوم أوريدو (%)</label>
+                <input type="number" step="0.01" id="dcbFeeOoredoo" placeholder="مثال: 2.00" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="dcbGlobalOtpExpiry">صلاحية كود التحقق OTP (بالثواني)</label>
+              <input type="number" id="dcbGlobalOtpExpiry" placeholder="مثال: 120" />
+            </div>
+
+            <div class="form-group">
+              <label>الشبكات المدعومة</label>
+              <div style="display: flex; gap: 15px; margin-top: 5px;">
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                  <input type="checkbox" id="carrier_mobilis" checked style="width: auto;" /> موبيليس
+                </label>
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                  <input type="checkbox" id="carrier_djezzy" checked style="width: auto;" /> جازي
+                </label>
+                <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                  <input type="checkbox" id="carrier_ooredoo" checked style="width: auto;" /> أوريدو
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 20px;">
+            <button type="button" class="action-btn primary-btn" onclick="saveDCBSettings()">
+              <i class="fas fa-save"></i> حفظ الإعدادات العامة
+            </button>
+          </div>
+        </div>
+
+        <!-- Carrier API Configs Card -->
+        <div class="card card-half">
+          <h2 class="card-title"><i class="fas fa-key"></i> إعدادات الربط مع المتعاملين (Carrier APIs)</h2>
+          
+          <div class="form-grid" style="grid-template-columns: 1fr; gap: 20px;">
+            <!-- Mobilis -->
+            <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;">
+              <h4 style="color: #00ffc3; margin-bottom: 10px;"><i class="fas fa-link"></i> ربط موبيليس (Mobilis)</h4>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input type="text" id="api_key_mobilis" placeholder="API Key" style="margin-bottom: 5px;" />
+                <input type="password" id="api_secret_mobilis" placeholder="API Secret" style="margin-bottom: 5px;" />
+              </div>
+              <input type="text" id="endpoint_mobilis" placeholder="Endpoint URL (https://...)" />
+            </div>
+
+            <!-- Djezzy -->
+            <div style="border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;">
+              <h4 style="color: #00ffc3; margin-bottom: 10px;"><i class="fas fa-link"></i> ربط جازي (Djezzy)</h4>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input type="text" id="api_key_djezzy" placeholder="API Key" style="margin-bottom: 5px;" />
+                <input type="password" id="api_secret_djezzy" placeholder="API Secret" style="margin-bottom: 5px;" />
+              </div>
+              <input type="text" id="endpoint_djezzy" placeholder="Endpoint URL (https://...)" />
+            </div>
+
+            <!-- Ooredoo -->
+            <div>
+              <h4 style="color: #00ffc3; margin-bottom: 10px;"><i class="fas fa-link"></i> ربط أوريدو (Ooredoo)</h4>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <input type="text" id="api_key_ooredoo" placeholder="API Key" style="margin-bottom: 5px;" />
+                <input type="password" id="api_secret_ooredoo" placeholder="API Secret" style="margin-bottom: 5px;" />
+              </div>
+              <input type="text" id="endpoint_ooredoo" placeholder="Endpoint URL (https://...)" />
+            </div>
+          </div>
+
+          <div style="margin-top: 20px;">
+            <button type="button" class="action-btn primary-btn" onclick="saveDCBCarriers()">
+              <i class="fas fa-save"></i> حفظ مفاتيح الربط
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transactions Log Card -->
+      <div class="card">
+        <h2 class="card-title"><i class="fas fa-history"></i> سجل معاملات الدفع بالرصيد (سوبر أدمن)</h2>
+        
+        <div class="toolbar" style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+          <input type="text" id="dcbSearchPhone" placeholder="بحث برقم الهاتف..." style="flex: 1; min-width: 200px;" oninput="filterDCBTransactions()" />
+          
+          <select id="dcbFilterCarrier" onchange="filterDCBTransactions()">
+            <option value="all">كل الشبكات</option>
+            <option value="mobilis">موبيليس</option>
+            <option value="djezzy">جازي</option>
+            <option value="ooredoo">أوريدو</option>
+          </select>
+          
+          <select id="dcbFilterStatus" onchange="filterDCBTransactions()">
+            <option value="all">كل الحالات</option>
+            <option value="completed">مكتملة</option>
+            <option value="pending">قيد التحقق</option>
+            <option value="otp_sent">تم إرسال OTP</option>
+            <option value="failed">فاشلة</option>
+          </select>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>رقم المعاملة</th>
+                <th>رقم الهاتف</th>
+                <th>الشبكة</th>
+                <th>المبلغ الإجمالي (دج)</th>
+                <th>رسوم المنصة (دج)</th>
+                <th>رسوم الشركة (دج)</th>
+                <th>صافي التاجر (دج)</th>
+                <th>الحالة</th>
+                <th>تاريخ العملية</th>
+              </tr>
+            </thead>
+            <tbody id="dcbTransactionsTable">
+              <tr>
+                <td colspan="9" style="text-align:center; padding:30px; color:rgba(255,255,255,0.4);">
+                  جاري تحميل سجل المعاملات...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main><!-- /#mainContent -->
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- MODALS                                          -->
+  <!-- ═══════════════════════════════════════════════ -->
+
+  <!-- Edit User Modal -->
+  <div id="editUserModal" class="admin-modal" role="dialog" aria-labelledby="editModalTitle" aria-hidden="true">
+    <div class="modal-content">
+      <button type="button" class="close-modal" onclick="closeEditModal()" aria-label="إغلاق">×</button>
+      <h3 id="editModalTitle"><i class="fas fa-user-edit"></i> تعديل المستخدم</h3>
+      <input type="hidden" id="editUserId" />
+      <input type="hidden" id="editUserEmail" />
+      <div class="form-group">
+        <label>الاسم</label>
+        <input type="text" id="editUserName" />
+      </div>
+      <div class="form-group">
+        <label>الباقة</label>
+        <select id="editUserPlan">
+          <option value="basic">Basic</option>
+          <option value="gold">Gold</option>
+          <option value="premium">Premium</option>
+          <option value="vip">VIP</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>حالة الحساب</label>
+        <select id="editUserStatus">
+          <option value="pending_approval">بانتظار الموافقة</option>
+          <option value="active">مفعّل</option>
+          <option value="suspended">موقوف</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>حالة الدفع</label>
+        <select id="editPaymentStatus">
+          <option value="pending">معلّق</option>
+          <option value="paid">مدفوع</option>
+          <option value="failed">فاشل</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>شارة المتجر</label>
+        <select id="editStoreBadge">
+          <option value="">بدون شارة</option>
+          <option value="new">جديد</option>
+          <option value="featured">مميز</option>
+          <option value="trusted">موثوق</option>
+          <option value="top_seller">الأعلى مبيعاً</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>تاريخ انتهاء اشتراك المتجر</label>
+        <input type="datetime-local" id="editSubscriptionEnd" style="width:100%; padding:8px; border-radius:6px; border:1px solid var(--border); background:var(--surface-2); color:var(--text); outline:none;" />
+      </div>
+      <div class="form-group">
+        <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+          <input type="checkbox" id="editIsFeatured" style="width:auto; height:auto;" />
+          تمييز المتجر في الصفحة الرئيسية
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="save-btn" onclick="saveUserEdit()">
+          <i class="fas fa-save"></i> حفظ التعديلات
+        </button>
+        <button type="button" class="action-btn secondary-btn" onclick="closeEditModal()">إلغاء</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HelpDesk Reply Modal -->
+  <div id="replyTicketModal" class="admin-modal" role="dialog" aria-labelledby="replyModalTitle" aria-hidden="true">
+    <div class="modal-content">
+      <button type="button" class="close-modal" onclick="closeReplyModal()" aria-label="إغلاق">×</button>
+      <h3 id="replyModalTitle"><i class="fas fa-reply"></i> الرد على التذكرة</h3>
+      <input type="hidden" id="replyTicketId" />
+      <div id="replyTicketPreview" class="ticket-preview-box"></div>
+      <div class="form-group">
+        <label>ردّك</label>
+        <textarea id="replyText" rows="5" placeholder="اكتب ردك هنا..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>تحديث الحالة</label>
+        <select id="replyNewStatus">
+          <option value="in_progress">قيد المعالجة</option>
+          <option value="resolved">محلول</option>
+          <option value="closed">مغلق</option>
+        </select>
+      </div>
+      <button type="button" class="save-btn" onclick="submitTicketReply()">
+        <i class="fas fa-paper-plane"></i> إرسال الرد
+      </button>
+    </div>
+  </div>
+
+  <!-- Real Estate Photos Modal -->
+  <div id="rePhotosModal" class="admin-modal" role="dialog" aria-hidden="true" style="z-index: 10002;">
+    <div class="modal-content" style="max-width: 520px;">
+      <button type="button" class="close-modal" onclick="closeAllAdminModals()">×</button>
+      <h3><i class="fas fa-images"></i> صور العقار</h3>
+      <div id="reModalPhotosContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-top: 15px; max-height: 400px; overflow-y: auto;">
+        <!-- Images dynamically injected -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Overlay -->
+  <div id="adminModalOverlay" class="admin-modal-overlay" onclick="closeAllAdminModals()"></div>
+
+  <!-- Toast Notification Container -->
+  <div id="adminToastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Scripts -->
+  <script src="js/dcb-engine.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

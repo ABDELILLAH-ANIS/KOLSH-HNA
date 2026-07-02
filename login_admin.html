@@ -1,0 +1,58 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-key="admin_title">دخول الإدارة - كلش هنا</title>
+  <link rel="stylesheet" href="css/login.css">
+  <link href="https://fonts.googleapis.com/css2?family=Gumela&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/login-config.js"></script>
+  <style>
+    /* إضافة لمسة خاصة لصفحة الإدارة */
+    body { background: radial-gradient(circle at center, #2c0b1f 0%, #000000 100%); }
+    .auth-box { border-top: 4px solid #ff0055; box-shadow: 0 10px 40px rgba(255, 0, 85, 0.2); }
+    .welcome { color: #ff0055; }
+    #loginBtn { background: linear-gradient(45deg, #ff0055, #ffaa00); }
+    #loginBtn:hover { box-shadow: 0 0 20px rgba(255, 0, 85, 0.6); }
+  </style>
+</head>
+
+<body>
+  <div class="language">
+    <button onclick="toggleLangMenu()">🌐</button>
+    <ul class="lang-menu" id="languageMenu">
+      <li onclick="setLanguage('ar')">🇩🇿 العربية</li>
+      <li onclick="setLanguage('fr')">🇫🇷 Français</li>
+      <li onclick="setLanguage('en')">🇺🇸 English</li>
+    </ul>
+  </div>
+
+  <div class="auth-box" id="loginBox">
+    <div class="welcome" data-key="admin_welcome" style="font-size: 24px; margin-bottom: 10px;">🛡️ لوحة التحكم الإدارية</div>
+    <h2 data-key="admin_heading">تسجيل الدخول (للإدارة فقط)</h2>
+
+    <div class="form-group">
+      <label for="email" data-key="email">البريد الإلكتروني</label>
+      <input type="email" id="email" dir="ltr" placeholder="admin@example.com" />
+    </div>
+
+    <div class="form-group">
+      <label for="password" data-key="password">كلمة المرور</label>
+      <input type="password" id="password" />
+    </div>
+
+    <button id="loginBtn" data-key="admin_login_button">دخول الإدارة</button>
+
+    <div class="error-message" id="errorMessage"></div>
+    <div class="success-message" id="successMessage"></div>
+
+    <button id="backButton" data-key="back_to_home" onclick="window.location.href='index.html'" style="margin-top:20px;">⬅ العودة للرئيسية</button>
+  </div>
+
+  <script src="js/login_admin.js"></script>
+</body>
+
+</html>
